@@ -1,0 +1,2960 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оқырман қалыптастыру шеберханасы</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for Teacher Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Tone.js for Sound Effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter & Playfair Display -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        royal: {
+                            950: '#0a1128',
+                            900: '#101d42',
+                            800: '#1b2e63',
+                            700: '#27408b',
+                        },
+                        parchment: {
+                            50: '#fdfbf7',
+                            100: '#f8f3e6',
+                            200: '#efe5cc',
+                            300: '#e2d0a8',
+                        },
+                        gold: {
+                            400: '#fbbf24',
+                            500: '#d97706',
+                            600: '#b45309',
+                        },
+                        mystic: {
+                            500: '#7c3aed',
+                            600: '#6d28d9',
+                        },
+                        wood: {
+                            700: '#5c3a21',
+                            800: '#422815',
+                            900: '#2b180b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Kazakh Oyu-Ornek SVG Background Pattern */
+        .kazakh-pattern {
+            background-color: #101d42;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d97706' fill-opacity='0.12'%3E%3Cpath d='M30 10c4.418 0 8 3.582 8 8 0 2.5-1.15 4.73-2.95 6.2C37.65 25.4 39 28.02 39 31c0 4.418-3.582 8-8 8h-2c-4.418 0-8-3.582-8-8 0-2.98 1.35-5.6 3.95-6.8C23.15 22.73 22 20.5 22 18c0-4.418 3.582-8 8-8zm0 4a4 4 0 100 8 4 4 0 000-8zm-15 16c2.761 0 5 2.239 5 5s-2.239 5-5 5-5-2.239-5-5 2.239-5 5-5zm30 0c2.761 0 5 2.239 5 5s-2.239 5-5 5-5-2.239-5-5 2.239-5 5-5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .parchment-pattern {
+            background-color: #fdfbf7;
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0l10 10-10 10-10-10zM0 40l10 10-10 10-10-10zm80 0l10 10-10 10-10-10zM40 80l10 10-10 10-10-10z' fill='%23d97706' fill-opacity='0.04'/%3E%3C/svg%3E");
+        }
+
+        /* Magical Glow & Book Animations */
+        @keyframes floatBook {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1.5deg); }
+        }
+        .animate-float {
+            animation: floatBook 4s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(217, 119, 6, 0.3); }
+            50% { box-shadow: 0 0 28px rgba(251, 191, 36, 0.65); }
+        }
+        .magical-glow {
+            animation: pulseGlow 3s infinite;
+        }
+
+        @keyframes pageTurn {
+            0% { opacity: 0; transform: translateX(12px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        .page-transition {
+            animation: pageTurn 0.35s ease-out forwards;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #f8f3e6; }
+        ::-webkit-scrollbar-thumb { background: #d97706; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #b45309; }
+
+        /* Print styles for Certificate */
+        @media print {
+            body * { visibility: hidden; }
+            #certificate-printable, #certificate-printable * { visibility: visible; }
+            #certificate-printable {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 20px;
+                background: #fdfbf7 !important;
+            }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="parchment-pattern text-slate-800 antialiased min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- Top Header -->
+    <header class="kazakh-pattern text-white shadow-xl border-b-2 border-gold-500/60 sticky top-0 z-40">
+        <div class="max-w-full mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <!-- Left: Mobile Menu & Brand Logo -->
+            <div class="flex items-center gap-3">
+                <button id="mobile-menu-btn" onclick="toggleSidebar()" class="lg:hidden p-2 rounded-xl bg-royal-800 hover:bg-royal-700 text-gold-400 transition" aria-label="Мәзір">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <div onclick="navigateTo('home')" class="flex items-center gap-3 cursor-pointer group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-royal-950 shadow-lg group-hover:scale-105 transition">
+                        <i class="fas fa-book-open text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-serif font-bold text-base sm:text-lg tracking-wide text-amber-100 leading-tight" data-i18n="appTitle">ОҚЫРМАН ШЕБЕРХАНАСЫ</h1>
+                        <p class="text-[11px] text-gold-400 hidden sm:block" data-i18n="appSubtitle">Сиқырлы цифрлық кітапхана</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Controls -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Online/Offline Indicator -->
+                <span id="network-status" class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-900/60 text-emerald-300 border border-emerald-500/30">
+                    <span id="network-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="network-text" data-i18n="onlineMode">Онлайн</span>
+                </span>
+
+                <!-- Language Switcher -->
+                <div class="flex bg-royal-950/80 p-1 rounded-xl border border-gold-500/30">
+                    <button onclick="setLanguage('kk')" id="lang-kk" class="px-2 py-1 text-xs font-bold rounded-lg bg-gold-500 text-royal-950 transition">ҚАЗ</button>
+                    <button onclick="setLanguage('ru')" id="lang-ru" class="px-2 py-1 text-xs font-bold rounded-lg text-amber-100/70 hover:text-white transition">РУС</button>
+                    <button onclick="setLanguage('en')" id="lang-en" class="px-2 py-1 text-xs font-bold rounded-lg text-amber-100/70 hover:text-white transition">ENG</button>
+                </div>
+
+                <!-- Sound & Ambient Music Controls -->
+                <button onclick="toggleSound()" id="sound-toggle-btn" class="p-2.5 rounded-xl bg-royal-800/80 hover:bg-royal-700 text-gold-400 border border-gold-500/30 transition" title="Дыбыс эффектілері">
+                    <i id="sound-icon" class="fas fa-volume-up"></i>
+                </button>
+                <button onclick="toggleAmbientMusic()" id="music-toggle-btn" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-royal-800/80 hover:bg-royal-700 text-amber-200 border border-gold-500/30 text-xs font-medium transition" title="Фондық әуен">
+                    <i id="music-icon" class="fas fa-music text-gold-400"></i>
+                    <span data-i18n="ambientMusic">Әуен</span>
+                </button>
+
+                <!-- User Profile / Auth Trigger -->
+                <div id="header-user-area">
+                    <button onclick="openAuthModal('student')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-royal-950 font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2">
+                        <i class="fas fa-sparkles"></i>
+                        <span data-i18n="enterWorkshop">Шеберханаға кіру</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main App Wrapper -->
+    <div class="flex-1 flex relative">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-72 bg-royal-900 text-amber-50 border-r-2 border-gold-500/30 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col justify-between pt-16 lg:pt-0 shadow-2xl">
+            <div class="p-4 overflow-y-auto flex-1 space-y-1.5">
+                <!-- User Mini Card in Sidebar -->
+                <div id="sidebar-profile-card" class="mb-4 p-3.5 rounded-2xl bg-royal-950/70 border border-gold-500/30 hidden">
+                    <div class="flex items-center gap-3">
+                        <div id="sb-avatar" class="w-11 h-11 rounded-full bg-gradient-to-tr from-gold-500 to-amber-300 flex items-center justify-center text-royal-950 font-bold text-lg shadow">👤</div>
+                        <div class="overflow-hidden">
+                            <p id="sb-name" class="font-bold text-sm text-amber-100 truncate">Оқушы</p>
+                            <p id="sb-role-badge" class="text-xs text-gold-400 truncate">1-деңгей: Жас оқырман</p>
+                        </div>
+                    </div>
+                    <div id="sb-points-bar" class="mt-3">
+                        <div class="flex justify-between text-[11px] text-amber-200/80 mb-1">
+                            <span><i class="fas fa-star text-gold-400"></i> <span id="sb-points">0</span> ұпай</span>
+                            <span id="sb-next-lvl">100 ұпайға дейін</span>
+                        </div>
+                        <div class="w-full bg-royal-800 rounded-full h-2 overflow-hidden">
+                            <div id="sb-progress" class="bg-gradient-to-r from-gold-400 to-amber-500 h-2 rounded-full transition-all duration-500" style="width: 10%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Menu Links -->
+                <nav id="nav-links" class="space-y-1"></nav>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="p-4 border-t border-gold-500/20 bg-royal-950/50 text-xs text-amber-200/60 flex items-center justify-between">
+                <span><i class="fas fa-shield-alt text-gold-500 mr-1"></i> EdTech KZ</span>
+                <span class="text-gold-400 font-semibold">v2.5 Pro</span>
+            </div>
+        </aside>
+
+        <!-- Sidebar Backdrop for Mobile -->
+        <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-20 hidden lg:hidden"></div>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full page-transition">
+            <!-- Dynamic View Content Injected Here -->
+        </main>
+    </div>
+
+    <!-- Universal Modal Container -->
+    <div id="modal-overlay" class="fixed inset-0 bg-royal-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4 overflow-y-auto">
+        <div id="modal-box" class="bg-parchment-50 border-2 border-gold-500/50 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative my-8">
+            <button onclick="closeModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-parchment-200 hover:bg-gold-500 hover:text-white text-slate-700 flex items-center justify-center transition">
+                <i class="fas fa-times"></i>
+            </button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // SAFE STORAGE HELPER (Works inside Google Sites & Sandboxed Iframes)
+        // ==========================================
+        const memoryStorage = {};
+        const SafeStorage = {
+            getItem(key) {
+                try {
+                    return window.localStorage.getItem(key) || memoryStorage[key] || null;
+                } catch (e) {
+                    return memoryStorage[key] || null;
+                }
+            },
+            setItem(key, value) {
+                memoryStorage[key] = value;
+                try {
+                    window.localStorage.setItem(key, value);
+                } catch (e) {
+                    // Fallback silently to in-memory storage if third-party storage is blocked in iframe
+                }
+            }
+        };
+
+        // ==========================================
+        // 1. LOCALIZATION (KK, RU, EN)
+        // ==========================================
+        const I18N = {
+            kk: {
+                appTitle: "ОҚЫРМАН ШЕБЕРХАНАСЫ",
+                appSubtitle: "Сиқырлы цифрлық кітапхана",
+                onlineMode: "Онлайн",
+                offlineMode: "Офлайн",
+                ambientMusic: "Әуен",
+                enterWorkshop: "Шеберханаға кіру",
+                logout: "Шығу",
+                navHome: "Басты бет",
+                navStudentDash: "Оқырман профилі",
+                navOqyrman: "ОҚЫРМАН моделі (7 кезең)",
+                navBookSecret: "Кітаптың құпиясы",
+                navDetective: "Детектив оқырман",
+                navLitCourt: "Әдеби сот",
+                navCreative: "Шығармашылық зертхана",
+                navAudio: "Аудиокітап & Дауыс",
+                navAiMentor: "ЖИ Тәлімгер",
+                navFigures: "Ұлы тұлғалар",
+                navPassport: "Оқырман паспорты",
+                navGallery: "Үздік оқырмандар",
+                navTeacherDash: "Мұғалім аналитикасы",
+                navStudentsManage: "Оқушыларды басқару",
+                navLesson10: "10 минуттық сабақ",
+                heroWelcome: "Қош келдің, жас зерттеуші!",
+                heroTitle: "«Оқырман қалыптастыру шеберханасы» сиқырлы кітапханасына ен!",
+                heroDesc: "Кітап оқуды қызықты шытырман оқиғаға айналдыр. Тапсырмаларды орында, детектив бол, әдеби сотта өз ойыңды дәлелде және «Шебер оқырман» мәртебесіне жет!",
+                loginStudent: "Оқушы ретінде кіру",
+                loginTeacher: "Мұғалім ретінде кіру",
+                registerStudent: "Жаңа оқушы тіркеу",
+                points: "ұпай",
+                level: "Деңгей",
+                booksRead: "Оқылған кітап",
+                tasksDone: "Орындалған тапсырма",
+                saveBtn: "Сақтау және ұпай алу",
+                savedSuccess: "Нәтиже сәтті сақталды!",
+                teacherOnly: "Бұл бөлім тек мұғалімге қолжетімді.",
+                studentOnly: "Бұл бөлім оқушыларға арналған. Алдымен оқушы ретінде кіріңіз."
+            },
+            ru: {
+                appTitle: "МАСТЕРСКАЯ ЧИТАТЕЛЯ",
+                appSubtitle: "Волшебная цифровая библиотека",
+                onlineMode: "Онлайн",
+                offlineMode: "Офлайн",
+                ambientMusic: "Музыка",
+                enterWorkshop: "Войти в мастерскую",
+                logout: "Выйти",
+                navHome: "Главная страница",
+                navStudentDash: "Профиль читателя",
+                navOqyrman: "Модель ОҚЫРМАН (7 этапов)",
+                navBookSecret: "Тайна книги",
+                navDetective: "Детектив-читатель",
+                navLitCourt: "Литературный суд",
+                navCreative: "Творческая лаборатория",
+                navAudio: "Аудиокнига и Голос",
+                navAiMentor: "ИИ Наставник",
+                navFigures: "Великие личности",
+                navPassport: "Паспорт читателя",
+                navGallery: "Лучшие читатели",
+                navTeacherDash: "Аналитика учителя",
+                navStudentsManage: "Управление учениками",
+                navLesson10: "10-минутный урок",
+                heroWelcome: "Добро пожаловать, юный исследователь!",
+                heroTitle: "Войди в волшебную библиотеку «Мастерская формирования читателя»!",
+                heroDesc: "Преврати чтение в увлекательное приключение. Выполняй задания, стань детективом, защищай мнение в литературном суде и стань Мастером чтения!",
+                loginStudent: "Войти как ученик",
+                loginTeacher: "Войти как учитель",
+                registerStudent: "Регистрация ученика",
+                points: "баллов",
+                level: "Уровень",
+                booksRead: "Прочитано книг",
+                tasksDone: "Выполнено заданий",
+                saveBtn: "Сохранить и получить баллы",
+                savedSuccess: "Результат успешно сохранен!",
+                teacherOnly: "Этот раздел доступен только учителю.",
+                studentOnly: "Этот раздел для учеников. Пожалуйста, войдите как ученик."
+            },
+            en: {
+                appTitle: "READER'S WORKSHOP",
+                appSubtitle: "Magical Digital Library",
+                onlineMode: "Online",
+                offlineMode: "Offline",
+                ambientMusic: "Music",
+                enterWorkshop: "Enter Workshop",
+                logout: "Logout",
+                navHome: "Home Page",
+                navStudentDash: "Reader Profile",
+                navOqyrman: "OQYRMAN Model (7 Stages)",
+                navBookSecret: "Secret of the Book",
+                navDetective: "Detective Reader",
+                navLitCourt: "Literary Court",
+                navCreative: "Creative Lab",
+                navAudio: "Audiobook & Voice",
+                navAiMentor: "AI Mentor",
+                navFigures: "Great Figures",
+                navPassport: "Reader Passport",
+                navGallery: "Top Readers Gallery",
+                navTeacherDash: "Teacher Analytics",
+                navStudentsManage: "Manage Students",
+                navLesson10: "10-Minute Lesson",
+                heroWelcome: "Welcome, young explorer!",
+                heroTitle: "Step into the Magical Library of the Reader's Workshop!",
+                heroDesc: "Turn reading into an exciting adventure. Complete quests, act as a literary detective, defend your stance in court, and earn the Master Reader rank!",
+                loginStudent: "Login as Student",
+                loginTeacher: "Login as Teacher",
+                registerStudent: "Register Student",
+                points: "pts",
+                level: "Level",
+                booksRead: "Books Read",
+                tasksDone: "Tasks Completed",
+                saveBtn: "Save & Earn Points",
+                savedSuccess: "Saved successfully!",
+                teacherOnly: "This section is restricted to teachers.",
+                studentOnly: "This section is for students. Please log in as a student first."
+            }
+        };
+
+        // ==========================================
+        // 2. SOUND ENGINE (TONE.JS)
+        // ==========================================
+        let soundEnabled = true;
+        let musicPlaying = false;
+        let ambientLoop = null;
+
+        async function playSound(type) {
+            if (!soundEnabled || typeof Tone === 'undefined') return;
+            try {
+                if (Tone.context.state !== 'running') {
+                    await Tone.start();
+                }
+                const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+                synth.volume.value = -10;
+                if (type === 'click') {
+                    synth.triggerAttackRelease("C5", "32n");
+                } else if (type === 'page') {
+                    synth.triggerAttackRelease(["E4", "G4"], "16n");
+                } else if (type === 'success') {
+                    synth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+                } else if (type === 'levelup') {
+                    synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "4n");
+                } else if (type === 'error') {
+                    synth.triggerAttackRelease(["D3", "C3"], "8n");
+                }
+            } catch (e) { /* Audio blocked before user interaction */ }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            icon.className = soundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute text-rose-400';
+            showToast(soundEnabled ? 'Дыбыс эффектілері қосылды' : 'Дыбыс эффектілері өшірілді', 'info');
+        }
+
+        async function toggleAmbientMusic() {
+            if (typeof Tone === 'undefined') return;
+            if (Tone.context.state !== 'running') await Tone.start();
+            const btn = document.getElementById('music-toggle-btn');
+
+            if (!musicPlaying) {
+                const synth = new Tone.PolySynth(Tone.Synth, {
+                    oscillator: { type: "sine" },
+                    envelope: { attack: 1.5, decay: 1, sustain: 0.4, release: 2 }
+                }).toDestination();
+                synth.volume.value = -20;
+
+                const chords = [
+                    ["D4", "F4", "A4"],
+                    ["C4", "E4", "G4"],
+                    ["Bb3", "D4", "F4"],
+                    ["A3", "C4", "E4"]
+                ];
+                let idx = 0;
+                ambientLoop = new Tone.Loop(time => {
+                    synth.triggerAttackRelease(chords[idx % chords.length], "2n", time);
+                    idx++;
+                }, "2m").start(0);
+                Tone.Transport.start();
+                musicPlaying = true;
+                btn.classList.add('border-gold-400', 'bg-royal-700');
+                showToast('Сиқырлы кітапхана әуені қосылды 🎵', 'info');
+            } else {
+                if (ambientLoop) ambientLoop.stop();
+                Tone.Transport.stop();
+                musicPlaying = false;
+                btn.classList.remove('border-gold-400', 'bg-royal-700');
+                showToast('Фондық әуен өшірілді', 'info');
+            }
+        }
+
+        // ==========================================
+        // 3. DATA & EDUCATIONAL CONTENT
+        // ==========================================
+        const LEVELS = [
+            { level: 1, min: 0, title: "Жас оқырман", icon: "🌱", color: "text-emerald-600" },
+            { level: 2, min: 100, title: "Ізденімпаз оқырман", icon: "🔍", color: "text-blue-600" },
+            { level: 3, min: 200, title: "Белсенді оқырман", icon: "🔥", color: "text-amber-600" },
+            { level: 4, min: 300, title: "Зерттеуші оқырман", icon: "🧭", color: "text-indigo-600" },
+            { level: 5, min: 400, title: "Кітап білгірі", icon: "📜", color: "text-purple-600" },
+            { level: 6, min: 500, title: "Әдебиет сарапшысы", icon: "⚖️", color: "text-rose-600" },
+            { level: 7, min: 600, title: "Шебер оқырман", icon: "👑", color: "text-yellow-600" }
+        ];
+
+        const ACHIEVEMENTS_LIST = [
+            { id: 'first_book', title: 'Алғашқы кітап', desc: 'Алғашқы кітап зерттеу парағын толтырды', icon: '📘' },
+            { id: 'five_books', title: '5 кітап оқыды', desc: '5 кітапты талдап, қоржынға қосты', icon: '📚' },
+            { id: 'ten_books', title: '10 кітап оқыды', desc: 'Нағыз кітапқұмар ретінде 10 кітап оқыды', icon: '🏛️' },
+            { id: 'top_researcher', title: 'Үздік зерттеуші', desc: 'ОҚЫРМАН моделінің 7 кезеңін толық аяқтады', icon: '🔬' },
+            { id: 'top_analyst', title: 'Үздік талдаушы', desc: 'Әдеби сотта дәлелді пікір қорғады', icon: '⚖️' },
+            { id: 'creative_reader', title: 'Шығармашыл оқырман', desc: 'Шығармашылық зертханада туынды жазды', icon: '✍️' },
+            { id: 'weekly_best', title: 'Аптаның үздік оқырманы', desc: 'Детектив ойындарында жоғары нәтиже көрсетті', icon: '🏆' }
+        ];
+
+        const OQYRMAN_STAGES = [
+            {
+                letter: "О",
+                title: "Ой шақыру",
+                subtitle: "Тақырыпқа қызығушылық ояту және болжам жасау",
+                points: 10,
+                instruction: "Ыбырай Алтынсариннің «Әке мен бала» әңгімесін бастамас бұрын, сурет пен сұраққа назар аудар: Жолда жатқан ескі тағаны көргенде әкесі мен баласы не істеуі мүмкін? Өз болжамыңды жаз.",
+                promptPlaceholder: "Менің болжамым бойынша, әкесі тағаны алып...",
+                sampleHint: "Бұл әңгіме еңбекқорлық пен ұқыптылық туралы."
+            },
+            {
+                letter: "Қ",
+                title: "Қызығушылық ояту",
+                subtitle: "Кітап мұқабасын зерттеу және авторды анықтау",
+                points: 10,
+                instruction: "Қазақ балалар әдебиетінің атасы кім? Ол «Кел, балалар, оқылық!» өлеңін жазған. Төменге автордың аты-жөнін және оның шығармалары неге тәрбиелейтінін жаз.",
+                promptPlaceholder: "Автордың аты-жөні және шығармаларының мәні...",
+                sampleHint: "Ыбырай Алтынсарин — қазақ даласында алғаш мектеп ашқан ағартушы."
+            },
+            {
+                letter: "Ы",
+                title: "Ықыласпен оқу",
+                subtitle: "Мәтінді саналы оқу және негізгі ақпаратты табу",
+                points: 20,
+                storyText: "Бір күні әкесі мен баласы қалаға бара жатып, жолда жатқан бір ескі тағаны көреді. Әкесі: «Балам, мына тағаны ала жүр, керек болар», – дейді. Баласы ерініп: «Ескі тағаны не қылайын», – деп алмайды. Әкесі үндемей тағаны өзі алып, қалада темір ұстасына үш тиынға сатады. Ол ақшаға шие сатып алады. Қайтар жолда күн ыстық болып, бала шөлдейді. Әкесі шиені бір-бірлеп жерге тастай береді. Бала әр шиені жерден еңкейіп алып жейді.",
+                instruction: "Жоғарыдағы үзіндіні мұқият оқы (немесе дыбыстап тыңда). Әкесі тағаны неше тиынға сатты және мәтіндегі «ерініп» сөзінің мағынасын түсіндір.",
+                promptPlaceholder: "Тағаның бағасы және «ерініп» сөзінің мағынасы...",
+                sampleHint: "Үш тиынға сатты. Ерініп – жалқауланып, қимылдағысы келмей."
+            },
+            {
+                letter: "Р",
+                title: "Реттеп, зерттеу",
+                subtitle: "Оқиғалар тізбегі мен себеп-салдарды анықтау",
+                points: 20,
+                instruction: "Әңгімедегі оқиғаларды ретімен жаз: 1) Бала неге басында еңкеймеді? 2) Соңында неліктен он рет еңкеюге мәжбүр болды?",
+                promptPlaceholder: "Оқиғалар реті мен себебі...",
+                sampleHint: "Бір рет еңкеюге ерінген бала, соңында әр шие үшін еңкейді."
+            },
+            {
+                letter: "М",
+                title: "Мағынаны ашу",
+                subtitle: "Шығарманың негізгі идеясы мен түйінін түсіну",
+                points: 30,
+                instruction: "Әкесі баласына қандай өмірлік сабақ бергісі келді? «Аз жұмысты қиынсынсаң, көп жұмысқа тап боласың» деген мақал осы мәтінге сәйкес пе? Дәлелде.",
+                promptPlaceholder: "Негізгі идея және дәлелдеу...",
+                sampleHint: "Иә, кішкентай еңбектен қашқан адам үлкен бейнетке тап болады."
+            },
+            {
+                letter: "А",
+                title: "Автор идеясын талдау",
+                subtitle: "Сыни ойлау және өмірмен байланыстыру",
+                points: 30,
+                instruction: "Бүгінгі күнде өз өміріңде немесе мектепте осы баланың қателігіне ұқсас қандай жағдайлар кездеседі? Мысал келтір.",
+                promptPlaceholder: "Өмірмен байланысты мысалым...",
+                sampleHint: "Мысалы: үй тапсырмасын уақытында орындамай, емтихан алдында қиналу."
+            },
+            {
+                letter: "Н",
+                title: "Нәтиже шығару",
+                subtitle: "Шығармашылық қорытынды және рефлексия",
+                points: 40,
+                instruction: "Әңгіменің соңында бала әкесіне қандай алғыс сөз айтар еді? 3-4 сөйлемнен тұратын шағын монолог немесе қорытынды ой жаз.",
+                promptPlaceholder: "Баланың әкесіне айтқан сөзі...",
+                sampleHint: "Әке, бүгін маған үлкен өмірлік сабақ бердіңіз..."
+            }
+        ];
+
+        const DETECTIVE_GAMES = [
+            {
+                id: 'hidden_word',
+                type: 'Мәтіннен жасырылған сөзді табу',
+                points: 20,
+                question: "«Ғылым таппай мақтанба, Орын таппай баптанба, Құмарланып шаттанба, Ойнап босқа күлуге. Бес нәрседен қашық бол, Бес нәрсеге асық бол...» — Абайдың осы өлеңіндегі «бес асыл істің» алғашқысы қандай сөз?",
+                options: ["Талап", "Еріншек", "Мақтаншақ", "Өсек"],
+                correct: 0,
+                explanation: "Дұрыс! Бес асыл іс: Талап, еңбек, терең ой, қанағат, рақым."
+            },
+            {
+                id: 'character_guess',
+                type: 'Кейіпкерді сипаттамасы бойынша анықтау',
+                points: 20,
+                question: "Ол қиялшыл, мейірімді, бірақ тентектігі де бар бала. Мұғалімі Майқанованың сөмкесіне бақа салып жіберіп, кейін өз қателігін түсініп, құпия кеңес ашады. Бұл қай кейіпкер?",
+                options: ["Құрмаш", "Қожа (Қожаберген)", "Аян", "Сапар"],
+                correct: 1,
+                explanation: "Тамаша! Бұл Бердібек Соқпақбаевтың «Менің атым Қожа» повесіндегі басты кейіпкер."
+            },
+            {
+                id: 'sequence_order',
+                type: 'Оқиғаларды дұрыс ретке келтіру',
+                points: 25,
+                question: "Мұхтар Әуезовтің «Көксерек» әңгімесіндегі оқиғалардың дұрыс ретін таңда: (1) Көксеректің ауылдан қашып кетуі, (2) Құрмаштың бөлтірікті асырап алуы, (3) Ақас атты итпен айқасы.",
+                options: ["1 → 2 → 3", "2 → 1 → 3", "3 → 1 → 2", "2 → 3 → 1"],
+                correct: 1,
+                explanation: "Дәл солай! Алдымен Құрмаш бөлтірікті асырайды, кейін Көксерек тағылыққа тартып қашады, соңында Ақаспен айқасады."
+            },
+            {
+                id: 'evidence_find',
+                type: 'Мәтіннен дәлел іздеу',
+                points: 25,
+                question: "Сайын Мұратбековтің «Жусан иісі» әңгімесінде Аянның балаларға ертегі айтуының басты себебі неде еді?",
+                options: ["Балалардан ақша жинау үшін", "Жетімдік мұңын ұмытып, балаларға қуаныш сыйлау үшін", "Мұғалімнің тапсырмасы бойынша", "Кітап жазу үшін"],
+                correct: 1,
+                explanation: "Өте дұрыс! Аян қиын соғыс жылдарында достарының көңілін көтеріп, ертегі арқылы арманға жетеледі."
+            },
+            {
+                id: 'extra_info',
+                type: 'Артық ақпаратты анықтау',
+                points: 20,
+                question: "Қазақтың үш бәйтерегі қатарына кірмейтін жазушыны тап:",
+                options: ["Сәкен Сейфуллин", "Ілияс Жансүгіров", "Бейімбет Майлин", "Шоқан Уәлиханов"],
+                correct: 3,
+                explanation: "Дұрыс! Сәкен, Ілияс, Бейімбет — қазақ әдебиетінің үш бәйтерегі, ал Шоқан Уәлиханов — ХІХ ғасыр ғалымы."
+            },
+            {
+                id: 'true_false',
+                type: 'Дұрыс және бұрыс тұжырымдарды ажырату',
+                points: 15,
+                question: "Тұжырым: «Ахмет Байтұрсынұлы қазақ әліпбиін (төте жазу) жасап, алғашқы оқулықтар жазған ұлт ұстазы». Бұл тұжырым дұрыс па?",
+                options: ["Дұрыс (Ақиқат)", "Бұрыс (Жалған)"],
+                correct: 0,
+                explanation: "Ақиқат! Ахмет Байтұрсынұлы — қазақ тіл білімі мен әдебиеттану ғылымының негізін салушы."
+            },
+            {
+                id: 'riddle_solve',
+                type: 'Мәтін бойынша жұмбақ шешу',
+                points: 20,
+                question: "Қабаты бар, қанаты бар, сөйлемесе де ақыл айтар. Ашсаң — әлемге жол ашар, жапсаң — білімді ішіне жасырар. Бұл не?",
+                options: ["Кітап", "Қалам", "Домбыра", "Айна"],
+                correct: 0,
+                explanation: "Әрине, бұл — Кітап!"
+            }
+        ];
+
+        const GREAT_FIGURES = [
+            {
+                id: 'abay',
+                name: 'Абай Құнанбайұлы',
+                years: '1845 – 1904',
+                title: 'Ұлы ақын, ойшыл, ағартушы',
+                avatar: '📜',
+                bio: 'Семей өңірінде дүниеге келген қазақ жазба әдебиетінің негізін қалаушы, композитор, аудармашы.',
+                works: ['Қара сөздер (45 ғақлия)', 'Ескендір поэмасы', 'Масғұт', 'Көзімнің қарасы'],
+                facts: 'Абай орыс және шығыс классиктерін (Пушкин, Лермонтов, Гете) қазақ тіліне шебер аударған.',
+                quote: '«Артық білім кітапта, ерінбей оқып көруге»',
+                question: 'Абайдың қанша қара сөзі бар және олардың негізгі тақырыбы не?'
+            },
+            {
+                id: 'ybyrai',
+                name: 'Ыбырай Алтынсарин',
+                years: '1841 – 1889',
+                title: 'Ұлы ағартушы, педагог, жазушы',
+                avatar: '🏫',
+                bio: 'Қазақ даласында тұңғыш зайырлы мектептер ашқан педагог, қазақ балалар әдебиетінің атасы.',
+                works: ['Қазақ хрестоматиясы', 'Кел, балалар, оқылық!', 'Әке мен бала', 'Атымтай Жомарт'],
+                facts: '1864 жылы Торғайда қазақ балаларына арналған тұңғыш мектеп-интернатты ашты.',
+                quote: '«Бір Аллаға сыйынып, Кел, балалар, оқылық!»',
+                question: 'Ыбырай Алтынсариннің қандай әңгімесі еңбекқорлыққа үйретеді?'
+            },
+            {
+                id: 'akhmet',
+                name: 'Ахмет Байтұрсынұлы',
+                years: '1872 – 1937',
+                title: 'Ұлт ұстазы, ғалым, реформатор',
+                avatar: '✒️',
+                bio: 'Қазақ тіл білімінің негізін салушы, «Қазақ» газетінің бас редакторы, ақын, аудармашы.',
+                works: ['Әліппе', 'Тіл – құрал', 'Қырық мысал', 'Маса'],
+                facts: 'Араб графикасына негізделген қазақтың «Төте жазу» әліпбиін жасап шығарды.',
+                quote: '«Балам деген жұрт болмаса, жұртым дейтін бала қайдан шықсын!»',
+                question: 'Ахмет Байтұрсынұлының «Маса» жинағының басты мақсаты не болды?'
+            },
+            {
+                id: 'magzhan',
+                name: 'Мағжан Жұмабаев',
+                years: '1893 – 1938',
+                title: 'Сыршыл ақын, Алаш қайраткері',
+                avatar: '🔥',
+                bio: 'Қазақ поэзиясына жаңа леп әкелген лирик ақын, «Педагогика» оқулығының авторы.',
+                works: ['Батыр Баян', 'Мен жастарға сенемін', 'Педагогика', 'Түркістан'],
+                facts: 'Мағжан Мәскеудегі Жоғары әдебиет-көркемөнер институтында білім алған.',
+                quote: '«Арыстандай айбатты, Жолбарыстай қайратты — Мен жастарға сенемін!»',
+                question: 'Мағжан ақын жастардың бойынан қандай қасиеттерді көргісі келді?'
+            },
+            {
+                id: 'mukhtar',
+                name: 'Мұхтар Әуезов',
+                years: '1897 – 1961',
+                title: 'Заңғар жазушы, драматург, академик',
+                avatar: '📚',
+                bio: 'Әлемге әйгілі «Абай жолы» роман-эпопеясының авторы, қазақ әдебиетін әлемдік деңгейге көтерген тұлға.',
+                works: ['Абай жолы', 'Көксерек', 'Қараш-Қараш оқиғасы', 'Еңлік-Кебек'],
+                facts: '«Абай жолы» эпопеясы әлемнің 116 тіліне аударылған.',
+                quote: '«Ел болам десең, бесігіңді түзе»',
+                question: '«Көксерек» повесінде автор табиғат пен адам қатынасын қалай суреттейді?'
+            },
+            {
+                id: 'saken',
+                name: 'Сәкен Сейфуллин',
+                years: '1894 – 1938',
+                title: 'Ақын, жазушы, мемлекет қайраткері',
+                avatar: '🦢',
+                bio: 'Қазақ әдебиетінің негізін қалаушылардың бірі, «Аққудың айырылуы» поэмасының авторы.',
+                works: ['Көкшетау', 'Аққудың айырылуы', 'Тар жол, тайғақ кешу', 'Сыр сандық'],
+                facts: 'Сәкен сұлулық пен табиғатты жырлауда ерекше романтикалық стиль қалыптастырды.',
+                quote: '«Сыр сандықты ашып қара, Ашып қара, сырласым»',
+                question: 'Сәкен Сейфуллиннің «Аққудың айырылуы» поэмасында қандай құндылық дәріптеледі?'
+            },
+            {
+                id: 'iliyas',
+                name: 'Ілияс Жансүгіров',
+                years: '1894 – 1938',
+                title: 'Қазақ поэзиясының Құлагері',
+                avatar: '🐎',
+                bio: 'Эпикалық поэмалардың шебері, қазақ музыкасы мен өнерін жырға қосқан дүлдүл ақын.',
+                works: ['Құлагер', 'Күй', 'Күйші', 'Дала'],
+                facts: '«Құлагер» поэмасы қазақ поэзиясының алтын қорына енген үздік туынды.',
+                quote: '«Бұл ән бұрынғы әннен өзгерек»',
+                question: '«Құлагер» поэмасында Ақан сері мен тұлпарының тағдыры нені бейнелейді?'
+            },
+            {
+                id: 'gabit',
+                name: 'Ғабит Мүсірепов',
+                years: '1902 – 1985',
+                title: 'Сөз зергері, халық жазушысы',
+                avatar: '👑',
+                bio: 'Ана тақырыбын ерекше жырлаған классик жазушы, драматург, аудармашы.',
+                works: ['Ұлпан', 'Қазақ солдаты', 'Оянған өлке', 'Ананың анасы'],
+                facts: 'Ғабит Мүсіреповтің «Қыз Жібек» либреттосы бойынша тұңғыш қазақ операсы қойылды.',
+                quote: '«Ана — өмірдің гүлі, мейірімнің бұлағы»',
+                question: '«Ұлпан» романындағы басты кейіпкердің қай қасиеті саған ұнады?'
+            }
+        ];
+
+        const LIT_CASES = [
+            {
+                id: 'case_1',
+                title: 'Қожаның мұғалім сөмкесіне бақа салуы («Менің атым Қожа»)',
+                context: 'Қожа сабақ үстінде мұғалімі Майқанованы қорқыту үшін сөмкесіне бақа салып қояды. Кейін бұл ісіне қатты өкінеді.',
+                prompt: 'Қожаның бұл әрекетін қалай бағалайсың? Оның орнында болсаң не істер едің? Автор бұл оқиға арқылы қандай ой айтқысы келді?'
+            },
+            {
+                id: 'case_2',
+                title: 'Құрмаштың дала бөлтірігін асырап алуы («Көксерек»)',
+                context: 'Ауыл адамдары қасқыр апанын бұзғанда, Құрмаш кішкентай бөлтірікті аяп, үйіне әкеліп асырайды.',
+                prompt: 'Құрмаш дұрыс әрекет жасады ма? Жабайы табиғат өкілін қолға үйрету мүмкін бе? Өз пікіріңді дәлелде.'
+            },
+            {
+                id: 'case_3',
+                title: 'Атымтай Жомарттың күн сайын еңбек етуі («Атымтай Жомарт»)',
+                context: 'Атымтай Жомарт өте бай бола тұра, күн сайын ескі киім киіп, отын тасып, қара жұмыс істейді.',
+                prompt: 'Бай адамның ауыр еңбекпен айналысуын қолдайсың ба? Оның төрт себебінің қайсысы сен үшін ең маңызды?'
+            }
+        ];
+
+        // ==========================================
+        // 4. DATABASE STATE & PERSISTENCE (SAFE STORAGE)
+        // ==========================================
+        const STORAGE_KEY = 'oqyrman_workshop_db_v2';
+
+        const INITIAL_STUDENTS = [
+            {
+                id: 'st_1',
+                name: 'Әлихан Нұрланұлы',
+                grade: '7 «А»',
+                school: '№1 Ұлттық гимназия',
+                login: 'alikhan',
+                password: '123',
+                avatar: '👦🏻',
+                points: 145,
+                booksRead: [
+                    { id: 'b1', title: 'Менің атым Қожа', author: 'Бердібек Соқпақбаев', cover: '📘', summary: 'Қожаның мектептегі қызықты оқиғалары мен армандары туралы.', characters: 'Қожа, Жантас, Жанар, Майқанова', idea: 'Адамгершілік пен өзін-өзі тәрбиелеу', quote: 'Түбінде адам болатын бала!', impression: 'Өте әсерлі әрі күлкілі кітап.', date: '2026-11-18' }
+                ],
+                completedStages: [0, 1, 2, 3],
+                stageAnswers: {
+                    0: 'Темір ұстасына сатып, пайдаға асыру үшін.',
+                    1: 'Ыбырай Алтынсарин. Жастарды білімге шақыру.',
+                    2: 'Үш тиынға сатып, шие алды. Ерініп - жалқауланып.',
+                    3: 'Бала бір рет еңкеюге ерініп, соңында әр шие үшін еңкейді.'
+                },
+                detectiveCompleted: ['hidden_word', 'character_guess'],
+                litCourtSubmissions: [
+                    { id: 'lc1', caseTitle: 'Қожаның бақа салу оқиғасы', stance: 'Қарсымын, бірақ түсінуге тырысамын', evidence: 'Ол мұны жамандық ойлап емес, тентектікпен істеді.', counterArg: 'Мұғалімге құрмет көрсету керек еді.', conclusion: 'Қателігін түсініп, түзелуге уәде берді.', date: '2026-11-19', teacherScore: 30, teacherComment: 'Өте жақсы талдау!' }
+                ],
+                creativeWorks: [
+                    { id: 'cw1', type: 'Кейіпкерге хат', title: 'Қожаға кеңес', content: 'Сәлем, Қожа! Сенің жүрегің таза, тек ашуға бой алдырмай, сабағыңды жақсы оқы!', date: '2026-11-20', teacherGrade: 'Үздік' }
+                ],
+                audioLogs: [],
+                achievements: ['first_book', 'top_analyst', 'creative_reader'],
+                galleryApproved: true,
+                lastActive: '2026-11-21'
+            },
+            {
+                id: 'st_2',
+                name: 'Аружан Ерланқызы',
+                grade: '7 «А»',
+                school: '№1 Ұлттық гимназия',
+                login: 'aruzhan',
+                password: '123',
+                avatar: '👧🏻',
+                points: 230,
+                booksRead: [
+                    { id: 'b2', title: 'Көксерек', author: 'Мұхтар Әуезов', cover: '🐺', summary: 'Қасқыр бөлтірігі мен Құрмаштың тағдыры туралы.', characters: 'Құрмаш, Көксерек, Ақас', idea: 'Табиғат заңдылығына қарсы тұру мүмкін емес.', quote: 'Көксерек ауыл иттеріне қосылмады.', impression: 'Табиғатты құрметтеуге үйретеді.', date: '2026-11-15' },
+                    { id: 'b3', title: 'Ұлпан', author: 'Ғабит Мүсірепов', cover: '👑', summary: 'Ақылды қазақ әйелі Ұлпанның ел басқаруы.', characters: 'Ұлпан, Есеней', idea: 'Парасаттылық пен ел бірлігі.', quote: 'Ел анасы болған Ұлпан.', impression: 'Керемет тарихи роман.', date: '2026-11-19' }
+                ],
+                completedStages: [0, 1, 2, 3, 4, 5, 6],
+                stageAnswers: {
+                    0: 'Ұқыптылық үлгісін көрсету үшін.',
+                    1: 'Ыбырай Алтынсарин.',
+                    2: 'Үш тиынға сатты.',
+                    3: 'Еріншектік артық бейнет әкеледі.',
+                    4: 'Аз еңбектен қашсаң, көп бейнетке тап боласың.',
+                    5: 'Үй тапсырмасын уақытында орындамау кейін қиындық туғызады.',
+                    6: 'Әке, бүгін мен еңбектің қадірін түсіндім!'
+                },
+                detectiveCompleted: ['hidden_word', 'character_guess', 'true_false', 'riddle_solve'],
+                litCourtSubmissions: [],
+                creativeWorks: [],
+                audioLogs: [],
+                achievements: ['first_book', 'top_researcher', 'weekly_best'],
+                galleryApproved: true,
+                lastActive: '2026-11-21'
+            }
+        ];
+
+        function loadDB() {
+            const raw = SafeStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && Array.isArray(parsed.students)) return parsed;
+                } catch (e) {}
+            }
+            return {
+                currentUser: null,
+                lang: 'kk',
+                teacher: {
+                    id: 'teacher_1',
+                    name: 'Ахметова Мақпал Болтириковна',
+                    login: 'mugalim',
+                    password: '123',
+                    school: '№1 Ұлттық гимназия'
+                },
+                students: JSON.parse(JSON.stringify(INITIAL_STUDENTS))
+            };
+        }
+
+        let DB = loadDB();
+
+        function saveDB() {
+            SafeStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+        }
+
+        function getActiveStudent() {
+            if (!DB.currentUser || DB.currentUser.role !== 'student') return null;
+            return DB.students.find(s => s.id === DB.currentUser.id) || null;
+        }
+
+        function getLevelInfo(points) {
+            let current = LEVELS[0];
+            let next = LEVELS[1];
+            for (let i = 0; i < LEVELS.length; i++) {
+                if (points >= LEVELS[i].min) {
+                    current = LEVELS[i];
+                    next = LEVELS[i + 1] || null;
+                }
+            }
+            const progressPercent = next
+                ? Math.min(100, Math.round(((points - current.min) / (next.min - current.min)) * 100))
+                : 100;
+            return { current, next, progressPercent };
+        }
+
+        function awardPoints(student, amount, reason) {
+            if (!student) return;
+            const prevLevel = getLevelInfo(student.points).current.level;
+            student.points += amount;
+            student.lastActive = new Date().toISOString().split('T')[0];
+
+            // Check automatic achievements
+            if (student.booksRead.length >= 1 && !student.achievements.includes('first_book')) student.achievements.push('first_book');
+            if (student.booksRead.length >= 5 && !student.achievements.includes('five_books')) student.achievements.push('five_books');
+            if (student.booksRead.length >= 10 && !student.achievements.includes('ten_books')) student.achievements.push('ten_books');
+            if (student.completedStages.length >= 7 && !student.achievements.includes('top_researcher')) student.achievements.push('top_researcher');
+            if (student.litCourtSubmissions.length >= 1 && !student.achievements.includes('top_analyst')) student.achievements.push('top_analyst');
+            if (student.creativeWorks.length >= 1 && !student.achievements.includes('creative_reader')) student.achievements.push('creative_reader');
+            if (student.detectiveCompleted.length >= 4 && !student.achievements.includes('weekly_best')) student.achievements.push('weekly_best');
+
+            saveDB();
+            playSound('success');
+            showToast(`+${amount} ${t('points')} (${reason})`, 'success');
+
+            const newLevelInfo = getLevelInfo(student.points);
+            if (newLevelInfo.current.level > prevLevel) {
+                setTimeout(() => {
+                    playSound('levelup');
+                    showToast(`🎉 Жаңа деңгей ашылды: ${newLevelInfo.current.icon} ${newLevelInfo.current.title}!`, 'gold');
+                }, 600);
+            }
+            updateSidebarSummary();
+        }
+
+        // ==========================================
+        // 5. UI HELPERS & NAVIGATION
+        // ==========================================
+        let currentRoute = 'home';
+
+        function t(key) {
+            const lang = DB.lang || 'kk';
+            return (I18N[lang] && I18N[lang][key]) || I18N.kk[key] || key;
+        }
+
+        function setLanguage(lang) {
+            DB.lang = lang;
+            saveDB();
+            ['kk', 'ru', 'en'].forEach(l => {
+                const btn = document.getElementById(`lang-${l}`);
+                if (!btn) return;
+                if (l === lang) {
+                    btn.className = "px-2 py-1 text-xs font-bold rounded-lg bg-gold-500 text-royal-950 transition";
+                } else {
+                    btn.className = "px-2 py-1 text-xs font-bold rounded-lg text-amber-100/70 hover:text-white transition";
+                }
+            });
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.textContent = t(key);
+            });
+            renderNavigation();
+            navigateTo(currentRoute, true);
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-emerald-800 border-emerald-400 text-white',
+                gold: 'bg-gradient-to-r from-amber-600 to-yellow-600 border-yellow-300 text-royal-950 font-bold',
+                error: 'bg-rose-800 border-rose-400 text-white',
+                info: 'bg-royal-800 border-gold-400 text-amber-50'
+            };
+            toast.className = `pointer-events-auto p-3.5 rounded-2xl border shadow-xl text-sm flex items-center gap-2.5 transform transition-all duration-300 translate-y-2 opacity-0 ${colors[type] || colors.info}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'gold' ? 'fa-crown' : type === 'error' ? 'fa-exclamation-circle' : 'fa-sparkles'}"></i><span>${msg}</span>`;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3400);
+        }
+
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const bd = document.getElementById('sidebar-backdrop');
+            sb.classList.toggle('-translate-x-full');
+            bd.classList.toggle('hidden');
+        }
+
+        function openModal(html) {
+            document.getElementById('modal-content').innerHTML = html;
+            const overlay = document.getElementById('modal-overlay');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('modal-overlay');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+        }
+
+        function renderHeaderUser() {
+            const area = document.getElementById('header-user-area');
+            if (!DB.currentUser) {
+                area.innerHTML = `
+                    <button onclick="openAuthModal('student')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-royal-950 font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2">
+                        <i class="fas fa-sparkles"></i>
+                        <span>${t('enterWorkshop')}</span>
+                    </button>
+                `;
+                return;
+            }
+            if (DB.currentUser.role === 'teacher') {
+                area.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-mystic-600/80 border border-purple-400/40 text-xs font-semibold">
+                            <i class="fas fa-chalkboard-teacher text-amber-300"></i> Мұғалім
+                        </span>
+                        <button onclick="logout()" class="px-3 py-1.5 rounded-xl bg-rose-700/80 hover:bg-rose-600 text-white text-xs font-semibold transition">
+                            <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">${t('logout')}</span>
+                        </button>
+                    </div>
+                `;
+            } else {
+                const st = getActiveStudent();
+                if (!st) { DB.currentUser = null; renderHeaderUser(); return; }
+                area.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <button onclick="navigateTo('student_dash')" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-royal-800 hover:bg-royal-700 border border-gold-500/40 text-xs font-semibold transition">
+                            <span>${st.avatar}</span>
+                            <span class="hidden sm:inline max-w-[110px] truncate">${st.name}</span>
+                            <span class="px-1.5 py-0.5 rounded bg-gold-500 text-royal-950 font-bold">${st.points}</span>
+                        </button>
+                        <button onclick="logout()" class="p-2 rounded-xl bg-rose-700/80 hover:bg-rose-600 text-white text-xs transition" title="${t('logout')}">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function updateSidebarSummary() {
+            const card = document.getElementById('sidebar-profile-card');
+            if (!DB.currentUser) {
+                card.classList.add('hidden');
+                return;
+            }
+            card.classList.remove('hidden');
+            if (DB.currentUser.role === 'teacher') {
+                document.getElementById('sb-avatar').textContent = '👩‍🏫';
+                document.getElementById('sb-name').textContent = DB.teacher.name;
+                document.getElementById('sb-role-badge').textContent = 'Басқарушы және әдіскер';
+                document.getElementById('sb-points-bar').classList.add('hidden');
+            } else {
+                const st = getActiveStudent();
+                if (!st) return;
+                const lvl = getLevelInfo(st.points);
+                document.getElementById('sb-avatar').textContent = st.avatar;
+                document.getElementById('sb-name').textContent = st.name;
+                document.getElementById('sb-role-badge').textContent = `${lvl.current.icon} ${lvl.current.level}-деңгей: ${lvl.current.title}`;
+                document.getElementById('sb-points-bar').classList.remove('hidden');
+                document.getElementById('sb-points').textContent = st.points;
+                document.getElementById('sb-next-lvl').textContent = lvl.next ? `${lvl.next.min} ұпайға дейін` : 'MAX деңгей';
+                document.getElementById('sb-progress').style.width = `${lvl.progressPercent}%`;
+            }
+        }
+
+        function renderNavigation() {
+            const nav = document.getElementById('nav-links');
+            const role = DB.currentUser?.role || 'guest';
+
+            const menuItems = [
+                { id: 'home', icon: 'fa-home', label: t('navHome'), roles: ['guest', 'student', 'teacher'] },
+                { id: 'student_dash', icon: 'fa-user-graduate', label: t('navStudentDash'), roles: ['student'] },
+                { id: 'oqyrman', icon: 'fa-layer-group', label: t('navOqyrman'), roles: ['guest', 'student', 'teacher'], badge: '7' },
+                { id: 'book_secret', icon: 'fa-book-sparkles', label: t('navBookSecret'), roles: ['guest', 'student'] },
+                { id: 'detective', icon: 'fa-search', label: t('navDetective'), roles: ['guest', 'student'] },
+                { id: 'lit_court', icon: 'fa-balance-scale', label: t('navLitCourt'), roles: ['guest', 'student'] },
+                { id: 'creative', icon: 'fa-feather-alt', label: t('navCreative'), roles: ['guest', 'student'] },
+                { id: 'audio', icon: 'fa-microphone-alt', label: t('navAudio'), roles: ['guest', 'student'] },
+                { id: 'ai_mentor', icon: 'fa-robot', label: t('navAiMentor'), roles: ['guest', 'student', 'teacher'] },
+                { id: 'figures', icon: 'fa-landmark', label: t('navFigures'), roles: ['guest', 'student', 'teacher'] },
+                { id: 'passport', icon: 'fa-id-card', label: t('navPassport'), roles: ['student'] },
+                { id: 'gallery', icon: 'fa-trophy', label: t('navGallery'), roles: ['guest', 'student', 'teacher'] },
+                { id: 'teacher_dash', icon: 'fa-chart-pie', label: t('navTeacherDash'), roles: ['teacher'] },
+                { id: 'students_manage', icon: 'fa-users-cog', label: t('navStudentsManage'), roles: ['teacher'] },
+                { id: 'lesson10', icon: 'fa-stopwatch', label: t('navLesson10'), roles: ['teacher'] }
+            ];
+
+            nav.innerHTML = menuItems
+                .filter(item => item.roles.includes(role))
+                .map(item => {
+                    const active = currentRoute === item.id;
+                    return `
+                        <button onclick="navigateTo('${item.id}'); if(window.innerWidth<1024) toggleSidebar();"
+                            class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition ${
+                                active
+                                    ? 'bg-gradient-to-r from-gold-500 to-amber-500 text-royal-950 font-bold shadow-md'
+                                    : 'text-amber-100/85 hover:bg-royal-800 hover:text-white'
+                            }">
+                            <span class="flex items-center gap-3">
+                                <i class="fas ${item.icon} w-5 text-center ${active ? 'text-royal-950' : 'text-gold-400'}"></i>
+                                <span>${item.label}</span>
+                            </span>
+                            ${item.badge ? `<span class="px-2 py-0.5 text-[10px] rounded-full ${active ? 'bg-royal-950 text-gold-400' : 'bg-royal-800 text-gold-400'}">${item.badge}</span>` : ''}
+                        </button>
+                    `;
+                }).join('');
+        }
+
+        // ==========================================
+        // 6. AUTHENTICATION (STUDENT & TEACHER + QUICK DEMO LOGIN)
+        // ==========================================
+        function openAuthModal(defaultTab = 'student') {
+            playSound('page');
+            const html = `
+                <div class="text-center mb-5">
+                    <div class="w-14 h-14 mx-auto rounded-2xl bg-royal-900 text-gold-400 flex items-center justify-center text-2xl shadow-lg mb-3 border border-gold-500">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h2 class="font-serif text-2xl font-bold text-royal-900">Шеберханаға кіру</h2>
+                    <p class="text-sm text-slate-600">Өз рөліңізді таңдап, жүйеге кіріңіз немесе тіркеліңіз</p>
+                </div>
+
+                <!-- Quick 1-Click Demo Access Banner -->
+                <div class="mb-5 p-3.5 rounded-2xl bg-amber-50 border border-gold-500/40">
+                    <p class="text-xs font-bold text-royal-900 mb-2 flex items-center gap-1.5">
+                        <i class="fas fa-bolt text-gold-600"></i> Бір басу арқылы жылдам кіру (Демо аккаунттар):
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <button type="button" onclick="quickDemoLogin('student', 'alikhan')" class="px-3 py-2 rounded-xl bg-white hover:bg-gold-500 hover:text-royal-950 border border-amber-300 text-xs font-bold text-royal-900 transition flex items-center justify-center gap-1.5 shadow-sm">
+                            <span>👦🏻</span> Әлихан (7 «А»)
+                        </button>
+                        <button type="button" onclick="quickDemoLogin('student', 'aruzhan')" class="px-3 py-2 rounded-xl bg-white hover:bg-gold-500 hover:text-royal-950 border border-amber-300 text-xs font-bold text-royal-900 transition flex items-center justify-center gap-1.5 shadow-sm">
+                            <span>👧🏻</span> Аружан (7 «А»)
+                        </button>
+                        <button type="button" onclick="quickDemoLogin('teacher', 'mugalim')" class="px-3 py-2 rounded-xl bg-mystic-600 hover:bg-mystic-500 text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
+                            <span>👩‍🏫</span> Мұғалім кабинеті
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Role Tabs -->
+                <div class="grid grid-cols-3 gap-2 p-1.5 bg-parchment-200 rounded-2xl mb-5">
+                    <button onclick="switchAuthTab('student')" id="tab-student" class="py-2 rounded-xl text-xs sm:text-sm font-bold transition ${defaultTab === 'student' ? 'bg-royal-900 text-gold-400 shadow' : 'text-slate-700'}">Оқушы кіруі</button>
+                    <button onclick="switchAuthTab('register')" id="tab-register" class="py-2 rounded-xl text-xs sm:text-sm font-bold transition ${defaultTab === 'register' ? 'bg-royal-900 text-gold-400 shadow' : 'text-slate-700'}">Тіркелу</button>
+                    <button onclick="switchAuthTab('teacher')" id="tab-teacher" class="py-2 rounded-xl text-xs sm:text-sm font-bold transition ${defaultTab === 'teacher' ? 'bg-mystic-600 text-white shadow' : 'text-slate-700'}">Мұғалім кіруі</button>
+                </div>
+
+                <!-- Student Login Form -->
+                <form id="form-student" onsubmit="handleStudentLogin(event)" class="${defaultTab === 'student' ? '' : 'hidden'} space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Логин</label>
+                        <input type="text" id="st-login" value="alikhan" required class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-white focus:outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Құпиясөз</label>
+                        <input type="password" id="st-pass" value="123" required class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-white focus:outline-none focus:border-gold-500">
+                    </div>
+                    <p class="text-xs text-slate-500 bg-parchment-100 p-2.5 rounded-xl border border-parchment-300">
+                        <i class="fas fa-info-circle text-gold-600"></i> Демо аккаунттар: <b>alikhan / 123</b> немесе <b>aruzhan / 123</b>
+                    </p>
+                    <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-royal-900 to-royal-800 hover:from-royal-800 hover:to-royal-700 text-gold-400 font-bold shadow-lg transition">
+                        Оқушы кабинетіне кіру
+                    </button>
+                </form>
+
+                <!-- Student Register Form -->
+                <form id="form-register" onsubmit="handleStudentRegister(event)" class="${defaultTab === 'register' ? '' : 'hidden'} space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Толық аты-жөні</label>
+                            <input type="text" id="reg-name" placeholder="Мысалы: Санжар Болатұлы" required class="w-full px-3.5 py-2 rounded-xl border border-parchment-300 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Сыныбы</label>
+                            <input type="text" id="reg-grade" placeholder="Мысалы: 6 «Б»" required class="w-full px-3.5 py-2 rounded-xl border border-parchment-300 bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Мектеп атауы</label>
+                        <input type="text" id="reg-school" value="№1 Ұлттық гимназия" required class="w-full px-3.5 py-2 rounded-xl border border-parchment-300 bg-white">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Логин ойлап тап</label>
+                            <input type="text" id="reg-login" placeholder="sanzhar" required class="w-full px-3.5 py-2 rounded-xl border border-parchment-300 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Құпиясөз</label>
+                            <input type="password" id="reg-pass" placeholder="***" required class="w-full px-3.5 py-2 rounded-xl border border-parchment-300 bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Кейіпкер бейнесін таңда</label>
+                        <select id="reg-avatar" class="w-full px-3.5 py-2 rounded-xl border border-parchment-300 bg-white">
+                            <option value="👦🏻">👦🏻 Жас батыр</option>
+                            <option value="👧🏻">👧🏻 Ару қыз</option>
+                            <option value="🦊">🦊 Тапқыр түлкі</option>
+                            <option value="🦅">🦅 Қыран бүркіт</option>
+                            <option value="🦉">🦉 Дана үкі</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 text-royal-950 font-bold shadow-lg transition">
+                        Тіркелу және саяхатты бастау
+                    </button>
+                </form>
+
+                <!-- Teacher Login Form -->
+                <form id="form-teacher" onsubmit="handleTeacherLogin(event)" class="${defaultTab === 'teacher' ? '' : 'hidden'} space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Мұғалім логині</label>
+                        <input type="text" id="t-login" value="mugalim" required class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Құпиясөз</label>
+                        <input type="password" id="t-pass" value="123" required class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-white">
+                    </div>
+                    <p class="text-xs text-slate-500 bg-purple-50 p-2.5 rounded-xl border border-purple-200">
+                        <i class="fas fa-shield-alt text-mystic-600"></i> Демо мұғалім: <b>mugalim / 123</b>
+                    </p>
+                    <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-mystic-600 to-indigo-700 text-white font-bold shadow-lg transition">
+                        Мұғалім кабинетіне кіру
+                    </button>
+                </form>
+            `;
+            openModal(html);
+        }
+
+        function switchAuthTab(tab) {
+            ['student', 'register', 'teacher'].forEach(tName => {
+                document.getElementById(`form-${tName}`).classList.toggle('hidden', tName !== tab);
+                const btn = document.getElementById(`tab-${tName}`);
+                if (tName === tab) {
+                    btn.className = `py-2 rounded-xl text-xs sm:text-sm font-bold transition ${tab === 'teacher' ? 'bg-mystic-600 text-white shadow' : 'bg-royal-900 text-gold-400 shadow'}`;
+                } else {
+                    btn.className = "py-2 rounded-xl text-xs sm:text-sm font-bold transition text-slate-700";
+                }
+            });
+        }
+
+        function quickDemoLogin(role, loginId) {
+            if (role === 'teacher') {
+                DB.currentUser = { id: DB.teacher.id, role: 'teacher' };
+                saveDB();
+                closeModal();
+                playSound('success');
+                showToast(`Қош келдіңіз, ${DB.teacher.name}!`, "success");
+                initWorkspace();
+                navigateTo('teacher_dash');
+            } else {
+                const st = DB.students.find(s => s.login === loginId) || DB.students[0];
+                if (st) {
+                    DB.currentUser = { id: st.id, role: 'student' };
+                    saveDB();
+                    closeModal();
+                    playSound('success');
+                    showToast(`Қош келдің, ${st.name}!`, "success");
+                    initWorkspace();
+                }
+            }
+        }
+
+        function handleStudentLogin(e) {
+            e.preventDefault();
+            const login = document.getElementById('st-login').value.trim().toLowerCase();
+            const pass = document.getElementById('st-pass').value.trim();
+            const found = DB.students.find(s => s.login.toLowerCase() === login && s.password === pass);
+            if (!found) {
+                playSound('error');
+                showToast("Логин немесе құпиясөз қате!", "error");
+                return;
+            }
+            DB.currentUser = { id: found.id, role: 'student' };
+            saveDB();
+            closeModal();
+            playSound('success');
+            showToast(`Қош келдің, ${found.name}!`, "success");
+            initWorkspace();
+        }
+
+        function handleStudentRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const grade = document.getElementById('reg-grade').value.trim();
+            const school = document.getElementById('reg-school').value.trim();
+            const login = document.getElementById('reg-login').value.trim().toLowerCase();
+            const password = document.getElementById('reg-pass').value.trim();
+            const avatar = document.getElementById('reg-avatar').value;
+
+            if (DB.students.some(s => s.login.toLowerCase() === login)) {
+                showToast("Бұл логин бос емес, басқа логин таңдаңыз.", "error");
+                return;
+            }
+
+            const newStudent = {
+                id: 'st_' + Date.now(),
+                name, grade, school, login, password, avatar,
+                points: 10,
+                booksRead: [],
+                completedStages: [],
+                stageAnswers: {},
+                detectiveCompleted: [],
+                litCourtSubmissions: [],
+                creativeWorks: [],
+                audioLogs: [],
+                achievements: [],
+                galleryApproved: false,
+                lastActive: new Date().toISOString().split('T')[0]
+            };
+            DB.students.push(newStudent);
+            DB.currentUser = { id: newStudent.id, role: 'student' };
+            saveDB();
+            closeModal();
+            playSound('levelup');
+            showToast(`Тіркелу сәтті аяқталды! +10 бастапқы ұпай берілді!`, "gold");
+            initWorkspace();
+        }
+
+        function handleTeacherLogin(e) {
+            e.preventDefault();
+            const login = document.getElementById('t-login').value.trim();
+            const pass = document.getElementById('t-pass').value.trim();
+            if (login === DB.teacher.login && pass === DB.teacher.password) {
+                DB.currentUser = { id: DB.teacher.id, role: 'teacher' };
+                saveDB();
+                closeModal();
+                playSound('success');
+                showToast(`Қош келдіңіз, ${DB.teacher.name}!`, "success");
+                initWorkspace();
+                navigateTo('teacher_dash');
+            } else {
+                playSound('error');
+                showToast("Мұғалім деректері қате!", "error");
+            }
+        }
+
+        function logout() {
+            DB.currentUser = null;
+            saveDB();
+            playSound('click');
+            showToast("Жүйеден шықтыңыз", "info");
+            initWorkspace();
+            navigateTo('home');
+        }
+
+        function initWorkspace() {
+            renderHeaderUser();
+            updateSidebarSummary();
+            renderNavigation();
+            if (DB.currentUser?.role === 'student' && currentRoute === 'home') {
+                navigateTo('student_dash', true);
+            } else {
+                navigateTo(currentRoute, true);
+            }
+        }
+
+        // ==========================================
+        // 7. ROUTER & VIEW RENDERERS
+        // ==========================================
+        function navigateTo(route, silent = false) {
+            currentRoute = route;
+            if (!silent) playSound('click');
+            renderNavigation();
+            const main = document.getElementById('main-content');
+            main.scrollTop = 0;
+
+            switch (route) {
+                case 'home': renderHome(main); break;
+                case 'student_dash': renderStudentDashboard(main); break;
+                case 'oqyrman': renderOqyrmanModel(main); break;
+                case 'book_secret': renderBookSecret(main); break;
+                case 'detective': renderDetectiveGame(main); break;
+                case 'lit_court': renderLitCourt(main); break;
+                case 'creative': renderCreativeLab(main); break;
+                case 'audio': renderAudioStudio(main); break;
+                case 'ai_mentor': renderAiMentor(main); break;
+                case 'figures': renderGreatFigures(main); break;
+                case 'passport': renderReaderPassport(main); break;
+                case 'gallery': renderTopGallery(main); break;
+                case 'teacher_dash': renderTeacherDashboard(main); break;
+                case 'students_manage': renderStudentsManage(main); break;
+                case 'lesson10': renderLesson10Min(main); break;
+                default: renderHome(main);
+            }
+        }
+
+        // ------------------------------------------
+        // VIEW 1: HOME PAGE (БАСТЫ БЕТ)
+        // ------------------------------------------
+        function renderHome(container) {
+            const st = getActiveStudent();
+            const oqyrmanLetters = [
+                { l: 'О', t: 'Ой шақыру' },
+                { l: 'Қ', t: 'Қызығушылық' },
+                { l: 'Ы', t: 'Ықыласпен оқу' },
+                { l: 'Р', t: 'Реттеу' },
+                { l: 'М', t: 'Мағынаны ашу' },
+                { l: 'А', t: 'Автор идеясы' },
+                { l: 'Н', t: 'Нәтиже' }
+            ];
+
+            container.innerHTML = `
+                <div class="space-y-8">
+                    <!-- Hero Magical Library Banner -->
+                    <section class="kazakh-pattern rounded-3xl p-6 sm:p-10 text-white relative overflow-hidden border-2 border-gold-500/50 shadow-2xl">
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+                            <div class="lg:col-span-7 space-y-5">
+                                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gold-500/20 border border-gold-400/50 text-gold-300 text-xs font-bold">
+                                    <i class="fas fa-sparkles"></i> ${t('heroWelcome')}
+                                </span>
+                                <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-amber-50">
+                                    ${t('heroTitle')}
+                                </h1>
+                                <p class="text-amber-100/85 text-sm sm:text-base leading-relaxed max-w-2xl">
+                                    ${t('heroDesc')}
+                                </p>
+
+                                <div class="flex flex-wrap gap-3 pt-2">
+                                    ${!DB.currentUser ? `
+                                        <button onclick="openAuthModal('student')" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-gold-400 to-gold-600 hover:from-gold-300 hover:to-gold-500 text-royal-950 font-extrabold text-sm shadow-xl magical-glow transition flex items-center gap-2">
+                                            <i class="fas fa-door-open"></i> ${t('enterWorkshop')}
+                                        </button>
+                                        <button onclick="quickDemoLogin('student', 'alikhan')" class="px-5 py-3.5 rounded-2xl bg-royal-800/90 hover:bg-royal-700 border border-gold-400/40 text-amber-100 font-semibold text-sm transition flex items-center gap-2">
+                                            <span>👦🏻</span> Демо оқушы (Әлихан)
+                                        </button>
+                                        <button onclick="quickDemoLogin('teacher', 'mugalim')" class="px-5 py-3.5 rounded-2xl bg-mystic-600/90 hover:bg-mystic-500 border border-purple-300/40 text-white font-semibold text-sm transition flex items-center gap-2">
+                                            <i class="fas fa-chalkboard-teacher"></i> Демо мұғалім
+                                        </button>
+                                    ` : `
+                                        <button onclick="navigateTo('${DB.currentUser.role === 'teacher' ? 'teacher_dash' : 'oqyrman'}')" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-gold-400 to-gold-600 text-royal-950 font-extrabold text-sm shadow-xl transition flex items-center gap-2">
+                                            <i class="fas fa-compass"></i> Саяхатты жалғастыру
+                                        </button>
+                                    `}
+                                </div>
+                            </div>
+
+                            <!-- Animated Magical Book Illustration -->
+                            <div class="lg:col-span-5 flex justify-center">
+                                <div class="relative w-64 h-64 sm:w-72 sm:h-72 rounded-3xl bg-gradient-to-b from-royal-800/80 to-royal-950/90 border border-gold-400/40 flex flex-col items-center justify-center p-6 text-center animate-float shadow-2xl">
+                                    <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-gold-500 to-amber-300 flex items-center justify-center text-royal-950 text-5xl shadow-lg mb-4">
+                                        📖
+                                    </div>
+                                    <h3 class="font-serif text-lg font-bold text-gold-300">7 Кезеңдік «ОҚЫРМАН» Жүйесі</h3>
+                                    <p class="text-xs text-amber-100/75 mt-1">Оқы • Зертте • Дәлелде • Шығармашылық жаса</p>
+                                    ${st ? `
+                                        <div class="mt-4 w-full bg-royal-950/80 p-2.5 rounded-xl border border-gold-500/30">
+                                            <div class="flex justify-between text-xs text-gold-300 font-bold mb-1">
+                                                <span>Жеке прогресс</span>
+                                                <span>${Math.round((st.completedStages.length / 7) * 100)}%</span>
+                                            </div>
+                                            <div class="w-full bg-royal-800 h-2 rounded-full">
+                                                <div class="bg-gold-400 h-2 rounded-full" style="width: ${Math.round((st.completedStages.length / 7) * 100)}%"></div>
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- OQYRMAN 7-Letter Visual Ribbon -->
+                    <section class="bg-white rounded-3xl p-6 border border-parchment-300 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
+                            <div>
+                                <h2 class="font-serif text-xl sm:text-2xl font-bold text-royal-900">«ОҚЫРМАН» — 7 кезеңдік әдістемелік модель</h2>
+                                <p class="text-xs sm:text-sm text-slate-600">Әр әріп — оқушының ойлау деңгейін дамытатын арнайы интерактивті баспалдақ</p>
+                            </div>
+                            <button onclick="navigateTo('oqyrman')" class="self-start sm:self-auto px-4 py-2 rounded-xl bg-royal-900 text-gold-400 text-xs font-bold hover:bg-royal-800 transition">
+                                Модульге өту <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+                            ${oqyrmanLetters.map((item, i) => `
+                                <div onclick="navigateTo('oqyrman')" class="cursor-pointer group p-4 rounded-2xl bg-parchment-100 hover:bg-royal-900 border border-parchment-300 hover:border-gold-500 text-center transition">
+                                    <div class="w-11 h-11 mx-auto rounded-xl bg-gold-500 text-royal-950 font-serif font-extrabold text-xl flex items-center justify-center shadow mb-2 group-hover:scale-110 transition">
+                                        ${item.l}
+                                    </div>
+                                    <p class="text-xs font-bold text-royal-900 group-hover:text-amber-100">${i + 1}. ${item.t}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </section>
+
+                    <!-- Interactive Modules Grid -->
+                    <section>
+                        <h2 class="font-serif text-xl sm:text-2xl font-bold text-royal-900 mb-4">Шеберхана зертханалары мен ойындары</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            ${[
+                                { route: 'book_secret', icon: '🔮', title: 'Кітаптың құпиясы', desc: 'Оқыған кітабыңа зерттеу парағын толтырып, қоржыныңа қос.' },
+                                { route: 'detective', icon: '🕵️', title: 'Детектив оқырман', desc: '7 түрлі логикалық ойын арқылы мәтіннен дәлел ізде.' },
+                                { route: 'lit_court', icon: '⚖️', title: 'Әдеби сот', desc: 'Кейіпкер әрекетін талда, қорға немесе айыпта, өз ойыңды дәлелде.' },
+                                { route: 'creative', icon: '✍️', title: 'Шығармашылық зертхана', desc: 'Әңгімені жалғастыр, кейіпкерге хат жаз, жаңа аяқталу ойлап тап.' }
+                            ].map(card => `
+                                <div onclick="navigateTo('${card.route}')" class="cursor-pointer bg-white hover:bg-parchment-100 p-5 rounded-3xl border border-parchment-300 hover:border-gold-500 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                                    <div>
+                                        <div class="text-3xl mb-3">${card.icon}</div>
+                                        <h3 class="font-bold text-royal-900 text-base mb-1.5">${card.title}</h3>
+                                        <p class="text-xs text-slate-600 leading-relaxed">${card.desc}</p>
+                                    </div>
+                                    <div class="mt-4 text-xs font-bold text-gold-600 flex items-center gap-1">
+                                        <span>Бастау</span> <i class="fas fa-chevron-right text-[10px]"></i>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </section>
+
+                    <!-- Quotes from Great Kazakh Figures -->
+                    <section class="bg-gradient-to-r from-wood-900 via-wood-800 to-royal-950 rounded-3xl p-6 sm:p-8 text-amber-50 border border-gold-500/40 shadow-lg">
+                        <h2 class="font-serif text-xl font-bold text-gold-400 mb-4 flex items-center gap-2">
+                            <i class="fas fa-quote-left"></i> Ұлы тұлғалардың кітап пен білім туралы нақыл сөздері
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="p-4 rounded-2xl bg-white/5 border border-gold-500/20">
+                                <p class="italic text-sm text-amber-100">«Артық білім кітапта, ерінбей оқып көруге.»</p>
+                                <p class="text-xs font-bold text-gold-400 mt-2">— Абай Құнанбайұлы</p>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-white/5 border border-gold-500/20">
+                                <p class="italic text-sm text-amber-100">«Кітап — ақылына ақы сұрамайтын ең адал досың.»</p>
+                                <p class="text-xs font-bold text-gold-400 mt-2">— Әлішер Науаи</p>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-white/5 border border-gold-500/20">
+                                <p class="italic text-sm text-amber-100">«Оқусыз білім жоқ, білімсіз күнің жоқ.»</p>
+                                <p class="text-xs font-bold text-gold-400 mt-2">— Ыбырай Алтынсарин</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            `;
+        }
+
+        // ------------------------------------------
+        // VIEW 2: STUDENT DASHBOARD (ОҚЫРМАН ПРОФИЛІ)
+        // ------------------------------------------
+        function renderStudentDashboard(container) {
+            const st = getActiveStudent();
+            if (!st) {
+                container.innerHTML = `<div class="p-8 text-center bg-white rounded-3xl border border-parchment-300"><p class="mb-4">${t('studentOnly')}</p><button onclick="openAuthModal('student')" class="px-5 py-2.5 rounded-xl bg-royal-900 text-gold-400 font-bold">${t('loginStudent')}</button></div>`;
+                return;
+            }
+            const lvl = getLevelInfo(st.points);
+            const totalTasks = st.completedStages.length + st.detectiveCompleted.length + st.litCourtSubmissions.length + st.creativeWorks.length;
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Profile Banner -->
+                    <div class="kazakh-pattern rounded-3xl p-6 sm:p-8 text-white border-2 border-gold-500/50 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+                            <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-gold-400 to-amber-200 flex items-center justify-center text-4xl shadow-xl border-2 border-white">
+                                ${st.avatar}
+                            </div>
+                            <div>
+                                <span class="px-3 py-1 rounded-full bg-gold-500/20 border border-gold-400/50 text-gold-300 text-xs font-bold">
+                                    ${lvl.current.icon} ${lvl.current.level}-деңгей: ${lvl.current.title}
+                                </span>
+                                <h2 class="font-serif text-2xl sm:text-3xl font-bold mt-2">${st.name}</h2>
+                                <p class="text-xs sm:text-sm text-amber-100/80 mt-1">
+                                    <i class="fas fa-school text-gold-400 mr-1"></i> ${st.school} • <b>${st.grade}</b> сынып
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-royal-950/80 p-4 rounded-2xl border border-gold-500/40 w-full md:w-72">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <span class="text-xs text-amber-200">Жинаған ұпай:</span>
+                                <span class="text-xl font-extrabold text-gold-400">${st.points} ⭐</span>
+                            </div>
+                            <div class="w-full bg-royal-800 h-2.5 rounded-full overflow-hidden mb-1.5">
+                                <div class="bg-gradient-to-r from-gold-400 to-amber-500 h-2.5 rounded-full" style="width: ${lvl.progressPercent}%"></div>
+                            </div>
+                            <p class="text-[11px] text-amber-200/70 text-right">
+                                ${lvl.next ? `Келесі деңгейге (${lvl.next.title}): ${lvl.next.min - st.points} ұпай қалды` : 'Ең жоғары деңгейге жеттіңіз!'}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-5 rounded-3xl border border-parchment-300 shadow-sm">
+                            <p class="text-xs text-slate-500 font-semibold">${t('booksRead')}</p>
+                            <p class="text-2xl font-extrabold text-royal-900 mt-1">${st.booksRead.length} 📚</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-3xl border border-parchment-300 shadow-sm">
+                            <p class="text-xs text-slate-500 font-semibold">ОҚЫРМАН кезеңдері</p>
+                            <p class="text-2xl font-extrabold text-emerald-700 mt-1">${st.completedStages.length} / 7 ✅</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-3xl border border-parchment-300 shadow-sm">
+                            <p class="text-xs text-slate-500 font-semibold">${t('tasksDone')}</p>
+                            <p class="text-2xl font-extrabold text-mystic-600 mt-1">${totalTasks} 🎯</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-3xl border border-parchment-300 shadow-sm">
+                            <p class="text-xs text-slate-500 font-semibold">Жетістік белгілері</p>
+                            <p class="text-2xl font-extrabold text-gold-600 mt-1">${st.achievements.length} / ${ACHIEVEMENTS_LIST.length} 🏅</p>
+                        </div>
+                    </div>
+
+                    <!-- Books Shelf & Achievements -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-serif text-lg font-bold text-royal-900">Менің кітап сөрем</h3>
+                                <button onclick="navigateTo('book_secret')" class="text-xs font-bold text-gold-600 hover:underline">+ Кітап қосу</button>
+                            </div>
+                            ${st.booksRead.length === 0 ? `<p class="text-sm text-slate-500">Әлі кітап қосылмаған. «Кітаптың құпиясы» бөліміне өтіңіз.</p>` : `
+                                <div class="space-y-3">
+                                    ${st.booksRead.map(b => `
+                                        <div class="p-3.5 rounded-2xl bg-parchment-100 border border-parchment-300 flex items-start gap-3">
+                                            <span class="text-2xl">${b.cover || '📘'}</span>
+                                            <div>
+                                                <h4 class="font-bold text-sm text-royal-900">${b.title}</h4>
+                                                <p class="text-xs text-slate-600">${b.author} • ${b.date}</p>
+                                                <p class="text-xs text-slate-700 mt-1 italic">«${b.quote}»</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `}
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-serif text-lg font-bold text-royal-900">Марапаттар мен белгілер</h3>
+                                <button onclick="navigateTo('passport')" class="text-xs font-bold text-mystic-600 hover:underline">Паспортты ашу →</button>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                ${ACHIEVEMENTS_LIST.map(ach => {
+                                    const unlocked = st.achievements.includes(ach.id);
+                                    return `
+                                        <div class="p-3 rounded-2xl border ${unlocked ? 'bg-amber-50 border-gold-400' : 'bg-slate-50 border-slate-200 opacity-50'} flex items-center gap-3">
+                                            <span class="text-2xl">${ach.icon}</span>
+                                            <div>
+                                                <p class="text-xs font-bold text-royal-900">${ach.title}</p>
+                                                <p class="text-[11px] text-slate-600">${ach.desc}</p>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ------------------------------------------
+        // VIEW 3: 7-STAGE "OQYRMAN" MODEL
+        // ------------------------------------------
+        let selectedStageIdx = 0;
+
+        function renderOqyrmanModel(container) {
+            const st = getActiveStudent();
+            const stage = OQYRMAN_STAGES[selectedStageIdx];
+            const isCompleted = st ? st.completedStages.includes(selectedStageIdx) : false;
+            const isUnlocked = !st ? true : (selectedStageIdx === 0 || st.completedStages.includes(selectedStageIdx - 1) || isCompleted);
+            const savedAnswer = st?.stageAnswers?.[selectedStageIdx] || '';
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm">
+                        <h2 class="font-serif text-2xl font-bold text-royal-900">«ОҚЫРМАН» – 7 кезеңдік әдістемелік модель</h2>
+                        <p class="text-sm text-slate-600 mt-1">Әр кезеңді ретімен орындап, келесі деңгейдің құлпын ашыңыз.</p>
+
+                        <!-- 7 Stage Stepper -->
+                        <div class="grid grid-cols-7 gap-2 mt-5">
+                            ${OQYRMAN_STAGES.map((s, idx) => {
+                                const done = st?.completedStages.includes(idx);
+                                const unlocked = !st || idx === 0 || st.completedStages.includes(idx - 1) || done;
+                                const active = idx === selectedStageIdx;
+                                return `
+                                    <button onclick="selectStage(${idx})"
+                                        class="p-2.5 sm:p-3 rounded-2xl border text-center transition flex flex-col items-center justify-center ${
+                                            active
+                                                ? 'bg-royal-900 text-gold-400 border-gold-500 shadow-lg scale-105'
+                                                : done
+                                                    ? 'bg-emerald-50 text-emerald-800 border-emerald-400'
+                                                    : unlocked
+                                                        ? 'bg-parchment-100 text-royal-900 border-parchment-300 hover:border-gold-400'
+                                                        : 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                                        }">
+                                        <span class="font-serif font-extrabold text-lg sm:text-xl">${s.letter}</span>
+                                        <span class="text-[10px] mt-0.5 hidden sm:block truncate w-full">${s.title}</span>
+                                        <span class="text-[10px] mt-1">${done ? '✅' : unlocked ? '🔓' : '🔒'}</span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Active Stage Workspace -->
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl border-2 border-gold-500/40 shadow-md">
+                        ${!isUnlocked ? `
+                            <div class="text-center py-10">
+                                <div class="text-5xl mb-3">🔒</div>
+                                <h3 class="font-serif text-xl font-bold text-royal-900">Бұл кезең әлі жабық</h3>
+                                <p class="text-sm text-slate-600 mt-1">Алдымен ${selectedStageIdx}-кезеңді («${OQYRMAN_STAGES[selectedStageIdx - 1].title}») орындаңыз.</p>
+                            </div>
+                        ` : `
+                            <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-parchment-200">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-royal-900 text-gold-400 font-serif font-extrabold text-2xl flex items-center justify-center shadow">
+                                        ${stage.letter}
+                                    </div>
+                                    <div>
+                                        <h3 class="font-serif text-xl font-bold text-royal-900">${selectedStageIdx + 1}-кезең: ${stage.title}</h3>
+                                        <p class="text-xs text-slate-500">${stage.subtitle}</p>
+                                    </div>
+                                </div>
+                                <span class="px-3.5 py-1.5 rounded-xl bg-amber-100 text-amber-800 font-bold text-xs border border-amber-300">
+                                    Марапат: +${stage.points} ұпай
+                                </span>
+                            </div>
+
+                            ${stage.storyText ? `
+                                <div class="my-5 p-5 rounded-2xl bg-parchment-100 border-l-4 border-gold-500">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs font-bold text-wood-800 uppercase tracking-wider">Мәтін үзіндісі («Әке мен бала»)</span>
+                                        <button onclick="speakText(\`${stage.storyText}\`)" class="px-3 py-1 rounded-lg bg-royal-900 text-gold-400 text-xs font-semibold hover:bg-royal-800 transition">
+                                            <i class="fas fa-volume-up mr-1"></i> Дыбыстап тыңдау
+                                        </button>
+                                    </div>
+                                    <p class="text-sm text-slate-800 leading-relaxed">${stage.storyText}</p>
+                                </div>
+                            ` : ''}
+
+                            <div class="my-5">
+                                <h4 class="text-sm font-bold text-royal-900 mb-2"><i class="fas fa-tasks text-gold-600 mr-1.5"></i> Тапсырма нұсқаулығы:</h4>
+                                <p class="text-sm text-slate-700 bg-blue-50/60 p-4 rounded-2xl border border-blue-200">${stage.instruction}</p>
+                            </div>
+
+                            <form onsubmit="submitOqyrmanStage(event)" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Сенің жауабың:</label>
+                                    <textarea id="oqyrman-answer-input" rows="4" required placeholder="${stage.promptPlaceholder}"
+                                        class="w-full p-4 rounded-2xl border border-parchment-300 bg-parchment-50 focus:bg-white focus:outline-none focus:border-gold-500 text-sm">${savedAnswer}</textarea>
+                                </div>
+
+                                <div class="flex flex-wrap items-center justify-between gap-3">
+                                    <button type="button" onclick="showToast('Кеңес: ${stage.sampleHint}', 'info')" class="px-4 py-2 rounded-xl bg-parchment-200 hover:bg-parchment-300 text-slate-800 text-xs font-bold transition">
+                                        <i class="fas fa-lightbulb text-gold-600 mr-1"></i> Бағыттаушы кеңес
+                                    </button>
+                                    <button type="submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-royal-950 font-bold text-sm shadow-md transition">
+                                        <i class="fas fa-check-circle mr-1.5"></i> ${isCompleted ? 'Жауапты жаңарту' : 'Тексеру және ұпай алу'}
+                                    </button>
+                                </div>
+                            </form>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectStage(idx) {
+            const st = getActiveStudent();
+            const isCompleted = st ? st.completedStages.includes(idx) : false;
+            const isUnlocked = !st ? true : (idx === 0 || st.completedStages.includes(idx - 1) || isCompleted);
+            if (!isUnlocked) {
+                playSound('error');
+                showToast("Алдымен алдыңғы кезеңді аяқтаңыз!", "error");
+                return;
+            }
+            selectedStageIdx = idx;
+            playSound('page');
+            renderOqyrmanModel(document.getElementById('main-content'));
+        }
+
+        function submitOqyrmanStage(e) {
+            e.preventDefault();
+            const st = getActiveStudent();
+            if (!st) {
+                openAuthModal('student');
+                showToast("Ұпай жинау үшін оқушы ретінде кіріңіз!", "info");
+                return;
+            }
+            const textAns = document.getElementById('oqyrman-answer-input').value.trim();
+            if (textAns.length < 5) {
+                showToast("Толығырақ жауап жазыңыз (кемінде 5 таңба).", "error");
+                return;
+            }
+
+            const stage = OQYRMAN_STAGES[selectedStageIdx];
+            const alreadyDone = st.completedStages.includes(selectedStageIdx);
+            st.stageAnswers[selectedStageIdx] = textAns;
+            if (!alreadyDone) {
+                st.completedStages.push(selectedStageIdx);
+                awardPoints(st, stage.points, `«${stage.letter} – ${stage.title}» кезеңі`);
+            } else {
+                saveDB();
+                showToast(t('savedSuccess'), 'success');
+            }
+
+            if (selectedStageIdx < OQYRMAN_STAGES.length - 1) {
+                selectedStageIdx++;
+            }
+            renderOqyrmanModel(document.getElementById('main-content'));
+        }
+
+        // ------------------------------------------
+        // VIEW 4: SECRET OF THE BOOK (КІТАПТЫҢ ҚҰПИЯСЫ)
+        // ------------------------------------------
+        function renderBookSecret(container) {
+            const st = getActiveStudent();
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl border border-parchment-300 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="font-serif text-2xl font-bold text-royal-900">🔮 Кітаптың құпиясы — Зерттеу парағы</h2>
+                                <p class="text-sm text-slate-600">Оқыған кітабыңның мазмұнын зерттеп, жеке кітапханаңа сақта (+30 ұпай).</p>
+                            </div>
+                        </div>
+
+                        <form onsubmit="saveBookSecret(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Кітап атауы</label>
+                                <input type="text" id="bs-title" placeholder="Мысалы: Абай жолы" required class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Авторы</label>
+                                <input type="text" id="bs-author" placeholder="Мысалы: Мұхтар Әуезов" required class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Мұқаба белгісі</label>
+                                <select id="bs-cover" class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50">
+                                    <option value="📘">📘 Көк мұқаба (Классика)</option>
+                                    <option value="📕">📕 Қызыл мұқаба (Шытырман)</option>
+                                    <option value="📗">📗 Жасыл мұқаба (Табиғат)</option>
+                                    <option value="📙">📙 Алтын мұқаба (Тарихи)</option>
+                                    <option value="🐺">🐺 Ерлік пен дала</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Басты кейіпкерлер</label>
+                                <input type="text" id="bs-chars" placeholder="Кейіпкерлер есімдері..." required class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Шығарманың қысқаша мазмұны</label>
+                                <textarea id="bs-summary" rows="3" placeholder="Кітап не туралы?" required class="w-full p-3.5 rounded-xl border border-parchment-300 bg-parchment-50"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Негізгі идеясы</label>
+                                <input type="text" id="bs-idea" placeholder="Автор не айтқысы келді?" required class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Ең ұнаған үзінді (дәйексөз)</label>
+                                <input type="text" id="bs-quote" placeholder="Кітаптан әсерлі сөйлем..." required class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Кітаптан алған әсерім</label>
+                                <textarea id="bs-impression" rows="2" placeholder="Бұл кітап саған қалай әсер етті?" required class="w-full p-3.5 rounded-xl border border-parchment-300 bg-parchment-50"></textarea>
+                            </div>
+                            <div class="md:col-span-2 flex justify-end">
+                                <button type="submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-royal-900 to-royal-800 text-gold-400 font-bold text-sm shadow-lg transition">
+                                    <i class="fas fa-bookmark mr-1.5"></i> Зерттеу парағын сақтау (+30 ұпай)
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Saved Books List -->
+                    ${st && st.booksRead.length > 0 ? `
+                        <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm">
+                            <h3 class="font-serif text-xl font-bold text-royal-900 mb-4">Зерттелген кітаптар тізімі (${st.booksRead.length})</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                ${st.booksRead.map(b => `
+                                    <div class="p-4 rounded-2xl bg-parchment-100 border border-parchment-300 space-y-1.5">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-bold text-base text-royal-900">${b.cover} ${b.title}</span>
+                                            <span class="text-xs text-slate-500">${b.date}</span>
+                                        </div>
+                                        <p class="text-xs font-semibold text-gold-600">Авторы: ${b.author}</p>
+                                        <p class="text-xs text-slate-700"><b>Кейіпкерлер:</b> ${b.characters}</p>
+                                        <p class="text-xs text-slate-700"><b>Идеясы:</b> ${b.idea}</p>
+                                        <p class="text-xs text-slate-600 italic bg-white p-2 rounded-xl border border-parchment-200">«${b.quote}»</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function saveBookSecret(e) {
+            e.preventDefault();
+            const st = getActiveStudent();
+            if (!st) {
+                openAuthModal('student');
+                showToast("Кітапты сақтау үшін оқушы ретінде кіріңіз!", "info");
+                return;
+            }
+            const book = {
+                id: 'b_' + Date.now(),
+                title: document.getElementById('bs-title').value.trim(),
+                author: document.getElementById('bs-author').value.trim(),
+                cover: document.getElementById('bs-cover').value,
+                characters: document.getElementById('bs-chars').value.trim(),
+                summary: document.getElementById('bs-summary').value.trim(),
+                idea: document.getElementById('bs-idea').value.trim(),
+                quote: document.getElementById('bs-quote').value.trim(),
+                impression: document.getElementById('bs-impression').value.trim(),
+                date: new Date().toISOString().split('T')[0]
+            };
+            st.booksRead.push(book);
+            awardPoints(st, 30, `«${book.title}» кітабын зерттеу`);
+            renderBookSecret(document.getElementById('main-content'));
+        }
+
+        // ------------------------------------------
+        // VIEW 5: DETECTIVE READER GAME (ДЕТЕКТИВ ОҚЫРМАН)
+        // ------------------------------------------
+        let detectiveTimer = null;
+        let detectiveSeconds = 0;
+        let currentDetectiveIdx = 0;
+
+        function renderDetectiveGame(container) {
+            if (detectiveTimer) clearInterval(detectiveTimer);
+            detectiveSeconds = 0;
+            const st = getActiveStudent();
+            const q = DETECTIVE_GAMES[currentDetectiveIdx];
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="kazakh-pattern rounded-3xl p-6 text-white border border-gold-500/40 flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h2 class="font-serif text-2xl font-bold text-gold-400">🕵️ «Детектив оқырман» интерактивті ойыны</h2>
+                            <p class="text-xs sm:text-sm text-amber-100/80">Мәтін құпияларын ашып, дәлелдер тап!</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="px-4 py-2 rounded-2xl bg-royal-950/80 border border-gold-400/40 text-sm font-bold text-gold-300">
+                                <i class="fas fa-stopwatch mr-1"></i> <span id="detective-clock">00:00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Game Selector Pills -->
+                    <div class="flex flex-wrap gap-2">
+                        ${DETECTIVE_GAMES.map((g, i) => {
+                            const done = st?.detectiveCompleted.includes(g.id);
+                            return `
+                                <button onclick="currentDetectiveIdx=${i}; renderDetectiveGame(document.getElementById('main-content'))"
+                                    class="px-3.5 py-2 rounded-xl text-xs font-bold border transition ${
+                                        i === currentDetectiveIdx
+                                            ? 'bg-royal-900 text-gold-400 border-gold-500 shadow'
+                                            : done
+                                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                                : 'bg-white text-slate-700 border-parchment-300 hover:border-gold-400'
+                                    }">
+                                    ${done ? '✅' : '🔎'} ${i + 1}-іс
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <!-- Active Detective Case Card -->
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl border-2 border-gold-500/40 shadow-md">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="px-3 py-1 rounded-full bg-purple-100 text-mystic-600 text-xs font-bold">${q.type}</span>
+                            <span class="text-xs font-bold text-amber-700">+${q.points} ұпай</span>
+                        </div>
+
+                        <h3 class="text-base sm:text-lg font-bold text-royal-900 leading-relaxed mb-6">${q.question}</h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="detective-options">
+                            ${q.options.map((opt, idx) => `
+                                <button onclick="checkDetectiveAnswer(${idx})"
+                                    class="p-4 rounded-2xl border-2 border-parchment-300 hover:border-gold-500 bg-parchment-50 hover:bg-amber-50 text-left text-sm font-semibold text-royal-900 transition flex items-center gap-3">
+                                    <span class="w-7 h-7 rounded-lg bg-royal-900 text-gold-400 text-xs font-bold flex items-center justify-center shrink-0">
+                                        ${String.fromCharCode(65 + idx)}
+                                    </span>
+                                    <span>${opt}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <div id="detective-feedback" class="mt-5 hidden p-4 rounded-2xl text-sm"></div>
+                    </div>
+                </div>
+            `;
+
+            detectiveTimer = setInterval(() => {
+                detectiveSeconds++;
+                const el = document.getElementById('detective-clock');
+                if (el) {
+                    const mins = String(Math.floor(detectiveSeconds / 60)).padStart(2, '0');
+                    const secs = String(detectiveSeconds % 60).padStart(2, '0');
+                    el.textContent = `${mins}:${secs}`;
+                } else {
+                    clearInterval(detectiveTimer);
+                }
+            }, 1000);
+        }
+
+        function checkDetectiveAnswer(selectedIdx) {
+            const q = DETECTIVE_GAMES[currentDetectiveIdx];
+            const fb = document.getElementById('detective-feedback');
+            fb.classList.remove('hidden');
+
+            if (selectedIdx === q.correct) {
+                fb.className = "mt-5 p-4 rounded-2xl text-sm bg-emerald-50 border border-emerald-400 text-emerald-900";
+                fb.innerHTML = `<p class="font-bold mb-1">🎉 Дәлел расталды! (${detectiveSeconds} секундта шештіңіз)</p><p>${q.explanation}</p>`;
+                const st = getActiveStudent();
+                if (st && !st.detectiveCompleted.includes(q.id)) {
+                    st.detectiveCompleted.push(q.id);
+                    awardPoints(st, q.points, `Детектив ойыны: ${q.type}`);
+                } else {
+                    playSound('success');
+                }
+            } else {
+                playSound('error');
+                fb.className = "mt-5 p-4 rounded-2xl text-sm bg-rose-50 border border-rose-400 text-rose-900";
+                fb.innerHTML = `<p class="font-bold mb-1">❌ Қате із! Қайта ойланып көр.</p><p>Мәтін деректерін мұқият салыстырып, басқа нұсқаны таңдаңыз.</p>`;
+            }
+        }
+
+        // ------------------------------------------
+        // VIEW 6: LITERARY COURT (ӘДЕБИ СОТ)
+        // ------------------------------------------
+        function renderLitCourt(container) {
+            const st = getActiveStudent();
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl border border-parchment-300 shadow-sm">
+                        <h2 class="font-serif text-2xl font-bold text-royal-900">⚖️ «Әдеби сот» — Кейіпкер әрекетін талдау</h2>
+                        <p class="text-sm text-slate-600 mt-1">Кейіпкердің шешімін таразылап, өз ұстанымыңды дәлелмен қорға (+30 ұпай).</p>
+
+                        <form onsubmit="submitLitCourt(event)" class="mt-6 space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Қаралатын әдеби іс:</label>
+                                <select id="lc-case" class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50 text-sm font-semibold">
+                                    ${LIT_CASES.map(c => `<option value="${c.title}">${c.title}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Сенің ұстанымың:</label>
+                                <select id="lc-stance" class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50 text-sm">
+                                    <option value="Қолдаймын (Ақтаушы тарап)">Қолдаймын (Ақтаушы тарап)</option>
+                                    <option value="Қарсымын (Айыптаушы тарап)">Қарсымын (Айыптаушы тарап)</option>
+                                    <option value="Бейтарап талдау (Әділ қазы)">Бейтарап талдау (Әділ қазы)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">1. Негізгі дәлел (мәтінге сүйеніп):</label>
+                                <textarea id="lc-evidence" rows="2" required placeholder="Кейіпкер неге бұлай істеді?" class="w-full p-3.5 rounded-xl border border-parchment-300 bg-parchment-50 text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">2. Қарсы пікір немесе балама шешім (Оның орнында сен не істер едің?):</label>
+                                <textarea id="lc-counter" rows="2" required placeholder="Басқаша қалай шешуге болар еді?" class="w-full p-3.5 rounded-xl border border-parchment-300 bg-parchment-50 text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">3. Қорытынды үкім (Автор ойы):</label>
+                                <textarea id="lc-conclusion" rows="2" required placeholder="Бұл оқиғадан қандай сабақ аламыз?" class="w-full p-3.5 rounded-xl border border-parchment-300 bg-parchment-50 text-sm"></textarea>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-amber-50 border border-gold-400/50 text-xs text-slate-700">
+                                <b>Мұғалімнің бағалау критерийлері:</b> (1) Мәтіннен нақты дәлел келтіру — 10 ұпай; (2) Сыни көзқарас пен балама шешім — 10 ұпай; (3) Логикалық қорытынды — 10 ұпай.
+                            </div>
+
+                            <button type="submit" class="px-6 py-3 rounded-xl bg-royal-900 hover:bg-royal-800 text-gold-400 font-bold text-sm shadow-md transition">
+                                <i class="fas fa-gavel mr-1.5"></i> Сот хаттамасын жіберу (+30 ұпай)
+                            </button>
+                        </form>
+                    </div>
+
+                    ${st && st.litCourtSubmissions.length > 0 ? `
+                        <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm space-y-3">
+                            <h3 class="font-serif text-lg font-bold text-royal-900">Менің сот талдауларым</h3>
+                            ${st.litCourtSubmissions.map(sub => `
+                                <div class="p-4 rounded-2xl bg-parchment-100 border border-parchment-300 text-xs space-y-1">
+                                    <div class="flex justify-between font-bold text-royal-900">
+                                        <span>${sub.caseTitle}</span>
+                                        <span class="text-gold-600">${sub.stance}</span>
+                                    </div>
+                                    <p><b>Дәлел:</b> ${sub.evidence}</p>
+                                    <p><b>Қорытынды:</b> ${sub.conclusion}</p>
+                                    ${sub.teacherComment ? `<p class="mt-2 p-2 rounded-lg bg-emerald-100 text-emerald-900 font-semibold">👩‍🏫 Мұғалім пікірі: ${sub.teacherComment}</p>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function submitLitCourt(e) {
+            e.preventDefault();
+            const st = getActiveStudent();
+            if (!st) { openAuthModal('student'); return; }
+            st.litCourtSubmissions.push({
+                id: 'lc_' + Date.now(),
+                caseTitle: document.getElementById('lc-case').value,
+                stance: document.getElementById('lc-stance').value,
+                evidence: document.getElementById('lc-evidence').value.trim(),
+                counterArg: document.getElementById('lc-counter').value.trim(),
+                conclusion: document.getElementById('lc-conclusion').value.trim(),
+                date: new Date().toISOString().split('T')[0]
+            });
+            awardPoints(st, 30, 'Әдеби сот талдауы');
+            renderLitCourt(document.getElementById('main-content'));
+        }
+
+        // ------------------------------------------
+        // VIEW 7: CREATIVE LAB (ШЫҒАРМАШЫЛЫҚ ЗЕРТХАНА)
+        // ------------------------------------------
+        function renderCreativeLab(container) {
+            const st = getActiveStudent();
+            const taskTypes = [
+                'Әңгімені жалғастыру',
+                'Басқа аяқталуын ойлап табу',
+                'Кейіпкерге хат жазу',
+                'Кітапқа жаңа мұқаба идеясы',
+                'Оқиғаға комикс сценарийі',
+                'Бес сөйлеммен мазмұндау',
+                'Өз кітабымның идеясы',
+                'Кітапқа жарнама (буктрейлер мәтіні)'
+            ];
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl border border-parchment-300 shadow-sm">
+                        <h2 class="font-serif text-2xl font-bold text-royal-900">✍️ Шығармашылық зертхана</h2>
+                        <p class="text-sm text-slate-600 mt-1">Қиялыңа ерік бер! Өз туындыңды жазып, мұғалімнің бағалауына жібер (+40 ұпай).</p>
+
+                        <form onsubmit="submitCreativeWork(event)" class="mt-6 space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Шығармашылық бағыт:</label>
+                                    <select id="cw-type" class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50 text-sm">
+                                        ${taskTypes.map(tt => `<option value="${tt}">${tt}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Жұмыс атауы:</label>
+                                    <input type="text" id="cw-title" placeholder="Мысалы: Қожаға хат" required class="w-full px-4 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50 text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Шығармашылық мәтінің:</label>
+                                <textarea id="cw-content" rows="5" required placeholder="Ойыңды осында еркін жаз..." class="w-full p-4 rounded-2xl border border-parchment-300 bg-parchment-50 text-sm"></textarea>
+                            </div>
+                            <button type="submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-mystic-600 to-indigo-700 text-white font-bold text-sm shadow-md transition">
+                                <i class="fas fa-magic mr-1.5"></i> Туындыны сақтау (+40 ұпай)
+                            </button>
+                        </form>
+                    </div>
+
+                    ${st && st.creativeWorks.length > 0 ? `
+                        <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm space-y-3">
+                            <h3 class="font-serif text-lg font-bold text-royal-900">Менің шығармашылық қоржыным</h3>
+                            ${st.creativeWorks.map(w => `
+                                <div class="p-4 rounded-2xl bg-parchment-100 border border-parchment-300">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-mystic-600">${w.type}</span>
+                                        <span class="text-xs text-slate-500">${w.date}</span>
+                                    </div>
+                                    <h4 class="font-bold text-sm text-royal-900">${w.title}</h4>
+                                    <p class="text-xs text-slate-700 mt-1 whitespace-pre-line">${w.content}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function submitCreativeWork(e) {
+            e.preventDefault();
+            const st = getActiveStudent();
+            if (!st) { openAuthModal('student'); return; }
+            st.creativeWorks.push({
+                id: 'cw_' + Date.now(),
+                type: document.getElementById('cw-type').value,
+                title: document.getElementById('cw-title').value.trim(),
+                content: document.getElementById('cw-content').value.trim(),
+                date: new Date().toISOString().split('T')[0]
+            });
+            awardPoints(st, 40, 'Шығармашылық жұмыс');
+            renderCreativeLab(document.getElementById('main-content'));
+        }
+
+        // ------------------------------------------
+        // VIEW 8: AUDIOBOOK & VOICE READING (WEB SPEECH & MEDIARECORDER)
+        // ------------------------------------------
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let lastAudioUrl = null;
+
+        function speakText(text) {
+            if (!('speechSynthesis' in window)) {
+                showToast("Браузер дыбыстап оқуды қолдамайды.", "error");
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = DB.lang === 'ru' ? 'ru-RU' : DB.lang === 'en' ? 'en-US' : 'kk-KZ';
+            utter.rate = 0.95;
+            window.speechSynthesis.speak(utter);
+            showToast("Мәтін дыбысталуда... 🔊", "info");
+        }
+
+        function renderAudioStudio(container) {
+            const sampleReading = "Ғылым таппай мақтанба, Орын таппай баптанба, Құмарланып шаттанба, Ойнап босқа күлуге. Бес нәрседен қашық бол, Бес нәрсеге асық бол, Адам болам десеңіз.";
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl border border-parchment-300 shadow-sm">
+                        <h2 class="font-serif text-2xl font-bold text-royal-900">🎙️ Аудиокітап және мәнерлеп оқу студиясы</h2>
+                        <p class="text-sm text-slate-600 mt-1">Мәтінді тыңда, өз дауысыңмен мәнерлеп оқып жаз және мұғалімге жібер (+20 ұпай).</p>
+
+                        <!-- Text to Read -->
+                        <div class="my-6 p-5 rounded-2xl bg-parchment-100 border border-gold-500/40">
+                            <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+                                <span class="text-xs font-bold text-wood-800">Абай Құнанбайұлы — «Ғылым таппай мақтанба»</span>
+                                <div class="flex gap-2">
+                                    <button onclick="speakText(\`${sampleReading}\`)" class="px-3.5 py-1.5 rounded-xl bg-royal-900 text-gold-400 text-xs font-bold hover:bg-royal-800 transition">
+                                        <i class="fas fa-play mr-1"></i> Дыбыстап оқу
+                                    </button>
+                                    <button onclick="window.speechSynthesis.cancel()" class="px-3 py-1.5 rounded-xl bg-slate-200 text-slate-700 text-xs font-bold">
+                                        <i class="fas fa-stop"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="font-serif text-base text-royal-950 leading-relaxed">${sampleReading}</p>
+                        </div>
+
+                        <!-- Voice Recorder Controls -->
+                        <div class="p-5 rounded-2xl bg-royal-950 text-white border border-gold-500/40 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-bold text-gold-400 text-sm">Дауыс жазу құрылғысы</h3>
+                                    <p id="rec-status" class="text-xs text-amber-100/70">Микрофон дайын. Жазуды бастау үшін батырманы басыңыз.</p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button id="btn-rec-start" onclick="startVoiceRecording()" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center gap-2 transition">
+                                        <i class="fas fa-microphone"></i> Жазуды бастау
+                                    </button>
+                                    <button id="btn-rec-stop" onclick="stopVoiceRecording()" disabled class="px-4 py-2.5 rounded-xl bg-slate-700 text-slate-300 text-xs font-bold disabled:opacity-40 transition">
+                                        <i class="fas fa-stop-circle"></i> Тоқтату
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="audio-playback-area" class="hidden pt-3 border-t border-white/10 space-y-3">
+                                <audio id="recorded-audio-player" controls class="w-full h-10"></audio>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[11px] text-amber-200/70"><i class="fas fa-lock text-gold-400"></i> Аудиожазба тек оқушы мен мұғалімге қолжетімді.</span>
+                                    <button onclick="sendAudioToTeacher()" class="px-4 py-2 rounded-xl bg-gold-500 text-royal-950 font-bold text-xs shadow transition">
+                                        <i class="fas fa-paper-plane mr-1"></i> Мұғалімге жіберу (+20 ұпай)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function startVoiceRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                recordedChunks = [];
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                    lastAudioUrl = URL.createObjectURL(blob);
+                    const player = document.getElementById('recorded-audio-player');
+                    player.src = lastAudioUrl;
+                    document.getElementById('audio-playback-area').classList.remove('hidden');
+                    stream.getTracks().forEach(t => t.stop());
+                };
+                mediaRecorder.start();
+                document.getElementById('rec-status').innerHTML = '<span class="text-rose-400 font-bold animate-pulse">● Жазылуда... Мәтінді мәнерлеп оқыңыз!</span>';
+                document.getElementById('btn-rec-start').disabled = true;
+                document.getElementById('btn-rec-stop').disabled = false;
+            } catch (err) {
+                showToast("Микрофонға рұқсат берілмеді немесе құрылғы табылмады.", "error");
+            }
+        }
+
+        function stopVoiceRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                document.getElementById('rec-status').textContent = 'Жазба аяқталды! Төменнен тыңдап көріңіз.';
+                document.getElementById('btn-rec-start').disabled = false;
+                document.getElementById('btn-rec-stop').disabled = true;
+            }
+        }
+
+        function sendAudioToTeacher() {
+            const st = getActiveStudent();
+            if (!st) { openAuthModal('student'); return; }
+            st.audioLogs.push({ date: new Date().toISOString().split('T')[0], title: 'Мәнерлеп оқу жазбасы' });
+            awardPoints(st, 20, 'Мәнерлеп оқу аудиожазбасы');
+        }
+
+        // ------------------------------------------
+        // VIEW 9: AI MENTOR (ЖИ КӨМЕКШІ – ОҚУ СЕРІКТЕСІ)
+        // ------------------------------------------
+        let aiChatHistory = [
+            {
+                sender: 'ai',
+                text: 'Сәлем, жас зерттеуші! Мен сенің оқу серіктесіңмін (ЖИ Тәлімгер). Мен дайын жауапты бірден айтпаймын, бірақ сұрақтар арқылы өздігіңнен шешім табуға көмектесемін! Қандай кітапты талқылаймыз?'
+            }
+        ];
+
+        function renderAiMentor(container) {
+            container.innerHTML = `
+                <div class="bg-white rounded-3xl border border-parchment-300 shadow-sm overflow-hidden flex flex-col h-[75vh]">
+                    <!-- AI Header -->
+                    <div class="kazakh-pattern p-4 sm:p-5 text-white flex items-center justify-between border-b border-gold-500/40">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-mystic-500 to-gold-400 flex items-center justify-center text-xl shadow">
+                                🤖
+                            </div>
+                            <div>
+                                <h2 class="font-serif font-bold text-base sm:text-lg text-amber-50">ЖИ Тәлімгер — Оқу серіктесі</h2>
+                                <p class="text-[11px] text-gold-300">Бағыттаушы сұрақтар • Сөздік түсіндірме • Ойландыру</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-200 text-[11px] font-semibold">
+                            Сократтық әдіс (Демо режим)
+                        </span>
+                    </div>
+
+                    <!-- Chat Messages -->
+                    <div id="ai-chat-box" class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4 bg-parchment-50">
+                        ${aiChatHistory.map(m => `
+                            <div class="flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}">
+                                <div class="max-w-[85%] sm:max-w-[75%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm ${
+                                    m.sender === 'user'
+                                        ? 'bg-royal-900 text-amber-50 rounded-br-none'
+                                        : 'bg-white border border-parchment-300 text-slate-800 rounded-bl-none'
+                                }">
+                                    ${m.text}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Quick Prompt Chips -->
+                    <div class="px-4 py-2 bg-parchment-100 border-t border-parchment-200 flex gap-2 overflow-x-auto">
+                        <button onclick="sendAiPrompt('«Ерініп» және «ғақлия» сөздерінің мағынасын түсіндірші')" class="shrink-0 px-3 py-1.5 rounded-xl bg-white border border-parchment-300 text-xs font-semibold text-royal-900 hover:border-gold-500">
+                            📖 Күрделі сөзді түсіндір
+                        </button>
+                        <button onclick="sendAiPrompt('«Менің атым Қожа» повесі бойынша ойландыратын сұрақ қойшы')" class="shrink-0 px-3 py-1.5 rounded-xl bg-white border border-parchment-300 text-xs font-semibold text-royal-900 hover:border-gold-500">
+                            🤔 Маған сұрақ қой
+                        </button>
+                        <button onclick="sendAiPrompt('Шығармашылық эссе жазуға идея берші')" class="shrink-0 px-3 py-1.5 rounded-xl bg-white border border-parchment-300 text-xs font-semibold text-royal-900 hover:border-gold-500">
+                            ✍️ Эссеге бағыт бер
+                        </button>
+                    </div>
+
+                    <!-- Input Bar -->
+                    <form onsubmit="handleAiForm(event)" class="p-3 sm:p-4 bg-white border-t border-parchment-300 flex gap-2">
+                        <input type="text" id="ai-user-input" placeholder="Сұрағыңды немесе ойыңды жаз..." required
+                            class="flex-1 px-4 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50 focus:outline-none focus:border-gold-500 text-sm">
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-royal-900 hover:bg-royal-800 text-gold-400 font-bold text-sm transition">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            `;
+            const box = document.getElementById('ai-chat-box');
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function handleAiForm(e) {
+            e.preventDefault();
+            const inp = document.getElementById('ai-user-input');
+            const val = inp.value.trim();
+            if (!val) return;
+            inp.value = '';
+            sendAiPrompt(val);
+        }
+
+        function sendAiPrompt(userText) {
+            aiChatHistory.push({ sender: 'user', text: userText });
+
+            // Socratic guiding response (never gives away direct exam answers immediately)
+            let reply = "";
+            const low = userText.toLowerCase();
+            if (low.includes('сөз') || low.includes('мағына')) {
+                reply = "🔍 <b>Сөздік зерттеуі:</b> «Ғақлия» — терең ойлы, даналық сөз деген мағына береді. Ал сен бұл сөзді қай шығармадан кездестірдің? Сол сөйлемді өз сөзіңмен қалай жеткізер едің?";
+            } else if (low.includes('қожа')) {
+                reply = "🤔 <b>Ойландыратын сұрақ:</b> Қожа құпия кеңес ашқан кезде өзіне қандай уәде берді? Сенің ойыңша, адам өз мінезін түзету үшін ең алдымен не істеуі керек?";
+            } else if (low.includes('эссе') || low.includes('идея')) {
+                reply = "✍️ <b>Шығармашылық бағыт:</b> Жақсы эссе 3 бөлімнен тұрады: 1) Кіріспе (негізгі сұрақ), 2) Негізгі бөлім (кітаптан 2 дәлел), 3) Қорытынды. Сен қай кейіпкер туралы жазғың келеді? Алдымен бірінші сөйлемін жазып көрші, мен бағыт беремін!";
+            } else {
+                reply = "💡 Өте қызықты ой! Мен саған дайын жауап бермес бұрын мына сұраққа жауап беріп көрші: <b>Бұл оқиғада кейіпкердің басты мақсаты не болды және оның әрекеті кімге әсер етті?</b> Жауабыңды жаз, бірге талдайық!";
+            }
+
+            aiChatHistory.push({ sender: 'ai', text: reply });
+            playSound('page');
+            renderAiMentor(document.getElementById('main-content'));
+        }
+
+        // ------------------------------------------
+        // VIEW 10: GREAT FIGURES GALLERY (ҰЛЫ ТҰЛҒАЛАР)
+        // ------------------------------------------
+        function renderGreatFigures(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm">
+                        <h2 class="font-serif text-2xl font-bold text-royal-900">🏛️ Қазақ әдебиетінің ұлы тұлғалары</h2>
+                        <p class="text-sm text-slate-600 mt-1">Ұлы жазушылар мен ақындардың өмірбаяны, шығармалары және қызықты деректерімен таныс.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        ${GREAT_FIGURES.map(fig => `
+                            <div onclick="openFigureModal('${fig.id}')" class="cursor-pointer group bg-white hover:bg-royal-900 p-5 rounded-3xl border border-parchment-300 hover:border-gold-500 shadow-sm hover:shadow-xl transition flex flex-col justify-between">
+                                <div>
+                                    <div class="w-16 h-16 rounded-2xl bg-parchment-100 group-hover:bg-gold-500 text-3xl flex items-center justify-center mb-4 shadow transition">
+                                        ${fig.avatar}
+                                    </div>
+                                    <span class="text-[11px] font-bold text-gold-600 group-hover:text-gold-300">${fig.years}</span>
+                                    <h3 class="font-serif text-lg font-bold text-royal-900 group-hover:text-white mt-0.5">${fig.name}</h3>
+                                    <p class="text-xs text-slate-600 group-hover:text-amber-100/80 mt-1">${fig.title}</p>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-parchment-200 group-hover:border-white/10 text-xs font-bold text-royal-800 group-hover:text-gold-400 flex items-center justify-between">
+                                    <span>Толығырақ оқу</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function openFigureModal(figId) {
+            const fig = GREAT_FIGURES.find(f => f.id === figId);
+            if (!fig) return;
+            playSound('page');
+            openModal(`
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-2xl bg-royal-900 text-gold-400 text-3xl flex items-center justify-center shadow">${fig.avatar}</div>
+                        <div>
+                            <span class="text-xs font-bold text-gold-600">${fig.years}</span>
+                            <h2 class="font-serif text-2xl font-bold text-royal-900">${fig.name}</h2>
+                            <p class="text-xs text-slate-600">${fig.title}</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-700 leading-relaxed">${fig.bio}</p>
+                    <div class="p-4 rounded-2xl bg-parchment-100 border border-parchment-300">
+                        <p class="text-xs font-bold text-royal-900 mb-1.5">Негізгі шығармалары:</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${fig.works.map(w => `<span class="px-2.5 py-1 rounded-lg bg-white border border-parchment-300 text-xs font-medium">${w}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="p-3.5 rounded-2xl bg-amber-50 border border-gold-400/50 text-xs">
+                        <b>Қызықты дерек:</b> ${fig.facts}
+                    </div>
+                    <blockquote class="italic font-serif text-base text-royal-900 border-l-4 border-gold-500 pl-3">
+                        ${fig.quote}
+                    </blockquote>
+                    <div class="p-4 rounded-2xl bg-royal-900 text-amber-50 text-xs">
+                        <p class="font-bold text-gold-400 mb-1">Оқырманға сұрақ:</p>
+                        <p>${fig.question}</p>
+                    </div>
+                </div>
+            `);
+        }
+
+        // ------------------------------------------
+        // VIEW 11: READER PASSPORT & CERTIFICATE (ОҚЫРМАН ПАСПОРТЫ)
+        // ------------------------------------------
+        function renderReaderPassport(container) {
+            const st = getActiveStudent();
+            if (!st) {
+                container.innerHTML = `<div class="p-8 text-center bg-white rounded-3xl"><p>${t('studentOnly')}</p></div>`;
+                return;
+            }
+            const lvl = getLevelInfo(st.points);
+            const totalTasks = st.completedStages.length + st.detectiveCompleted.length + st.litCourtSubmissions.length + st.creativeWorks.length;
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Passport Document -->
+                    <div class="kazakh-pattern rounded-3xl p-6 sm:p-8 text-white border-4 border-gold-500 shadow-2xl max-w-3xl mx-auto">
+                        <div class="flex justify-between items-center border-b border-gold-500/40 pb-4 mb-6">
+                            <div>
+                                <p class="text-[11px] uppercase tracking-widest text-gold-400">Қазақстан Республикасы • Цифрлық Білім Ортасы</p>
+                                <h2 class="font-serif text-2xl sm:text-3xl font-bold text-amber-50">ОҚЫРМАН ПАСПОРТЫ</h2>
+                            </div>
+                            <div class="text-4xl">🛂</div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 items-center">
+                            <div class="flex flex-col items-center p-4 rounded-2xl bg-royal-950/80 border border-gold-500/40">
+                                <span class="text-6xl mb-2">${st.avatar}</span>
+                                <span class="px-3 py-1 rounded-full bg-gold-500 text-royal-950 font-extrabold text-xs">ID: ${st.id.toUpperCase()}</span>
+                            </div>
+                            <div class="sm:col-span-2 space-y-2.5 text-sm">
+                                <p><span class="text-amber-200/70">Аты-жөні:</span> <b class="text-lg text-gold-300">${st.name}</b></p>
+                                <p><span class="text-amber-200/70">Сыныбы:</span> <b>${st.grade}</b> (${st.school})</p>
+                                <p><span class="text-amber-200/70">Оқырман мәртебесі:</span> <b class="text-emerald-300">${lvl.current.icon} ${lvl.current.title} (${lvl.current.level}-деңгей)</b></p>
+                                <div class="grid grid-cols-3 gap-2 pt-2">
+                                    <div class="p-2.5 rounded-xl bg-white/10 text-center">
+                                        <p class="text-lg font-extrabold text-gold-400">${st.booksRead.length}</p>
+                                        <p class="text-[10px]">Кітап</p>
+                                    </div>
+                                    <div class="p-2.5 rounded-xl bg-white/10 text-center">
+                                        <p class="text-lg font-extrabold text-gold-400">${totalTasks}</p>
+                                        <p class="text-[10px]">Тапсырма</p>
+                                    </div>
+                                    <div class="p-2.5 rounded-xl bg-white/10 text-center">
+                                        <p class="text-lg font-extrabold text-gold-400">${st.points}</p>
+                                        <p class="text-[10px]">Ұпай</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Electronic Certificate Generator -->
+                    <div class="max-w-3xl mx-auto space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-serif text-xl font-bold text-royal-900">🏅 Электрондық Сертификат</h3>
+                            <button onclick="window.print()" class="px-5 py-2.5 rounded-xl bg-gold-500 hover:bg-gold-400 text-royal-950 font-bold text-xs shadow transition no-print">
+                                <i class="fas fa-file-pdf mr-1.5"></i> PDF ретінде жүктеу / Басып шығару
+                            </button>
+                        </div>
+
+                        <div id="certificate-printable" class="parchment-pattern border-8 border-double border-gold-600 rounded-3xl p-8 sm:p-12 text-center shadow-xl relative">
+                            <div class="text-gold-600 text-3xl mb-2">⚜️</div>
+                            <p class="text-xs uppercase tracking-widest font-bold text-wood-700">«ОҚЫРМАН ҚАЛЫПТАСТЫРУ ШЕБЕРХАНАСЫ» ПЛАТФОРМАСЫ</p>
+                            <h1 class="font-serif text-3xl sm:text-4xl font-bold text-royal-900 my-3">СЕРТИФИКАТ</h1>
+                            <p class="text-sm text-slate-600">Осы сертификат белсенді оқырмандық ізденісі мен шығармашылық жетістіктері үшін</p>
+                            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-gold-600 my-4 underline decoration-gold-400">${st.name}</h2>
+                            <p class="text-sm text-slate-700 max-w-lg mx-auto">
+                                <b>${st.school}</b>, <b>${st.grade}</b> сынып оқушысына <b>«${lvl.current.title}»</b> деңгейіне жетіп, <b>${st.points} ұпай</b> жинағаны үшін табысталады.
+                            </p>
+                            <div class="mt-8 pt-4 border-t border-gold-500/30 flex justify-between items-center text-xs text-slate-600">
+                                <span>Берілген күні: <b>${new Date().toLocaleDateString('kk-KZ')}</b></span>
+                                <span class="font-serif font-bold text-royal-900">М.О. «Оқырман Шеберханасы»</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ------------------------------------------
+        // VIEW 12: TOP READERS GALLERY (ҮЗДІК ОҚЫРМАНДАР)
+        // ------------------------------------------
+        function renderTopGallery(container) {
+            const approvedStudents = [...DB.students]
+                .filter(s => s.galleryApproved)
+                .sort((a, b) => b.points - a.points);
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm flex flex-wrap justify-between items-center gap-3">
+                        <div>
+                            <h2 class="font-serif text-2xl font-bold text-royal-900">🏆 «Үздік оқырмандар» құрмет тақтасы</h2>
+                            <p class="text-sm text-slate-600">Мұғалім рұқсатымен жарияланған үздік оқырмандар рейтингі.</p>
+                        </div>
+                    </div>
+
+                    ${approvedStudents.length === 0 ? `
+                        <div class="bg-white p-8 rounded-3xl text-center text-slate-500">Қазірше жарияланған оқушылар жоқ.</div>
+                    ` : `
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                            ${approvedStudents.map((s, idx) => {
+                                const lvl = getLevelInfo(s.points);
+                                return `
+                                    <div class="bg-white p-6 rounded-3xl border-2 ${idx === 0 ? 'border-gold-500 shadow-lg' : 'border-parchment-300'} text-center relative">
+                                        <span class="absolute top-4 left-4 w-8 h-8 rounded-full bg-royal-900 text-gold-400 font-bold text-xs flex items-center justify-center">
+                                            #${idx + 1}
+                                        </span>
+                                        <div class="text-5xl mb-3">${s.avatar}</div>
+                                        <h3 class="font-serif text-lg font-bold text-royal-900">${s.name}</h3>
+                                        <p class="text-xs text-slate-500">${s.grade} • ${s.school}</p>
+                                        <div class="mt-3 inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">
+                                            ${lvl.current.icon} ${lvl.current.title}
+                                        </div>
+                                        <p class="text-2xl font-extrabold text-royal-900 mt-3">${s.points} ⭐</p>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        // ------------------------------------------
+        // VIEW 13: TEACHER ANALYTICS DASHBOARD (МҰҒАЛІМ КАБИНЕТІ)
+        // ------------------------------------------
+        let teacherCharts = [];
+
+        function renderTeacherDashboard(container) {
+            if (DB.currentUser?.role !== 'teacher') {
+                container.innerHTML = `<div class="p-8 text-center bg-white rounded-3xl"><p class="mb-4">${t('teacherOnly')}</p><button onclick="openAuthModal('teacher')" class="px-5 py-2.5 rounded-xl bg-mystic-600 text-white font-bold">${t('loginTeacher')}</button></div>`;
+                return;
+            }
+
+            const totalStudents = DB.students.length;
+            const totalBooks = DB.students.reduce((sum, s) => sum + s.booksRead.length, 0);
+            const totalTasks = DB.students.reduce((sum, s) => sum + s.completedStages.length + s.detectiveCompleted.length + s.litCourtSubmissions.length + s.creativeWorks.length, 0);
+            const avgPoints = totalStudents ? Math.round(DB.students.reduce((sum, s) => sum + s.points, 0) / totalStudents) : 0;
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm">
+                        <div>
+                            <h2 class="font-serif text-2xl font-bold text-royal-900">📊 Мұғалімнің аналитикалық кабинеті</h2>
+                            <p class="text-xs sm:text-sm text-slate-600">Оқушылардың оқырмандық сауаттылығы мен белсенділік көрсеткіштері (нақты деректер негізінде)</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="exportTeacherCSV()" class="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold shadow transition">
+                                <i class="fas fa-file-excel mr-1.5"></i> Excel (CSV) экспорт
+                            </button>
+                            <button onclick="window.print()" class="px-4 py-2.5 rounded-xl bg-royal-900 hover:bg-royal-800 text-gold-400 text-xs font-bold shadow transition">
+                                <i class="fas fa-print mr-1.5"></i> PDF есеп
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- KPI Metrics -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-5 rounded-3xl border border-parchment-300 shadow-sm">
+                            <p class="text-xs text-slate-500 font-semibold">Тіркелген оқушылар</p>
+                            <p class="text-2xl font-extrabold text-royal-900 mt-1">${totalStudents} 👩‍🎓</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-3xl border border-parchment-300 shadow-sm">
+                            <p class="text-xs text-slate-500 font-semibold">Оқылған кітаптар</p>
+                            <p class="text-2xl font-extrabold text-gold-600 mt-1">${totalBooks} 📚</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-3xl border border-parchment-300 shadow-sm">
+                            <p class="text-xs text-slate-500 font-semibold">Орындалған тапсырмалар</p>
+                            <p class="text-2xl font-extrabold text-emerald-700 mt-1">${totalTasks} ✅</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-3xl border border-parchment-300 shadow-sm">
+                            <p class="text-xs text-slate-500 font-semibold">Орташа ұпай</p>
+                            <p class="text-2xl font-extrabold text-mystic-600 mt-1">${avgPoints} ⭐</p>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm">
+                            <h3 class="font-bold text-sm text-royal-900 mb-3">Оқушылардың ұпай рейтингі</h3>
+                            <div class="h-64"><canvas id="chart-points"></canvas></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm">
+                            <h3 class="font-bold text-sm text-royal-900 mb-3">«ОҚЫРМАН» 7 кезеңі бойынша игеру көрсеткіші</h3>
+                            <div class="h-64"><canvas id="chart-stages"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Students Filter & Table -->
+                    <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm">
+                        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                            <h3 class="font-serif text-lg font-bold text-royal-900">Оқушылардың нәтижелер кестесі</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <input type="text" id="t-search" oninput="filterTeacherTable()" placeholder="Аты-жөні бойынша іздеу..."
+                                    class="px-3.5 py-2 rounded-xl border border-parchment-300 text-xs bg-parchment-50">
+                                <select id="t-sort" onchange="filterTeacherTable()" class="px-3.5 py-2 rounded-xl border border-parchment-300 text-xs bg-parchment-50">
+                                    <option value="desc">Ұпай (Кему ретімен)</option>
+                                    <option value="asc">Ұпай (Өсу ретімен)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                                <thead>
+                                    <tr class="border-b-2 border-parchment-300 text-slate-600">
+                                        <th class="py-3 px-2">Оқушы</th>
+                                        <th class="py-3 px-2">Сынып</th>
+                                        <th class="py-3 px-2">Кітап</th>
+                                        <th class="py-3 px-2">7 кезең</th>
+                                        <th class="py-3 px-2">Ұпай</th>
+                                        <th class="py-3 px-2">Деңгей</th>
+                                        <th class="py-3 px-2">Әрекет</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="teacher-students-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            filterTeacherTable();
+            initTeacherCharts();
+        }
+
+        function filterTeacherTable() {
+            const query = (document.getElementById('t-search')?.value || '').toLowerCase();
+            const sortDir = document.getElementById('t-sort')?.value || 'desc';
+            const tbody = document.getElementById('teacher-students-tbody');
+            if (!tbody) return;
+
+            const list = DB.students
+                .filter(s => s.name.toLowerCase().includes(query) || s.grade.toLowerCase().includes(query))
+                .sort((a, b) => sortDir === 'desc' ? b.points - a.points : a.points - b.points);
+
+            tbody.innerHTML = list.map(s => {
+                const lvl = getLevelInfo(s.points);
+                return `
+                    <tr class="border-b border-parchment-200 hover:bg-parchment-100">
+                        <td class="py-3 px-2 font-bold text-royal-900">${s.avatar} ${s.name}</td>
+                        <td class="py-3 px-2">${s.grade}</td>
+                        <td class="py-3 px-2">${s.booksRead.length}</td>
+                        <td class="py-3 px-2">${s.completedStages.length}/7</td>
+                        <td class="py-3 px-2 font-extrabold text-gold-600">${s.points}</td>
+                        <td class="py-3 px-2 text-xs">${lvl.current.icon} ${lvl.current.title}</td>
+                        <td class="py-3 px-2">
+                            <button onclick="openStudentDetailModal('${s.id}')" class="px-3 py-1 rounded-lg bg-royal-900 text-gold-400 text-xs font-bold hover:bg-royal-800">
+                                Тексеру / Бағалау
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function initTeacherCharts() {
+            teacherCharts.forEach(c => c.destroy());
+            teacherCharts = [];
+            if (typeof Chart === 'undefined') return;
+
+            const ctx1 = document.getElementById('chart-points');
+            if (ctx1) {
+                teacherCharts.push(new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: DB.students.map(s => s.name.split(' ')[0]),
+                        datasets: [{
+                            label: 'Жинаған ұпай',
+                            data: DB.students.map(s => s.points),
+                            backgroundColor: '#d97706',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                }));
+            }
+
+            const ctx2 = document.getElementById('chart-stages');
+            if (ctx2) {
+                const stageCounts = OQYRMAN_STAGES.map((_, idx) =>
+                    DB.students.filter(s => s.completedStages.includes(idx)).length
+                );
+                teacherCharts.push(new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: OQYRMAN_STAGES.map(s => `${s.letter} (${s.title})`),
+                        datasets: [{
+                            label: 'Аяқтаған оқушылар саны',
+                            data: stageCounts,
+                            borderColor: '#1b2e63',
+                            backgroundColor: 'rgba(27, 46, 99, 0.15)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+                }));
+            }
+        }
+
+        function openStudentDetailModal(stId) {
+            const st = DB.students.find(s => s.id === stId);
+            if (!st) return;
+            openModal(`
+                <div class="space-y-4">
+                    <h3 class="font-serif text-xl font-bold text-royal-900">${st.avatar} ${st.name} (${st.grade})</h3>
+                    <div class="grid grid-cols-2 gap-3 text-xs bg-parchment-100 p-3.5 rounded-2xl">
+                        <p><b>Логин:</b> ${st.login}</p>
+                        <p><b>Құпиясөз:</b> ${st.password}</p>
+                        <p><b>Оқылған кітап:</b> ${st.booksRead.length}</p>
+                        <p><b>ОҚЫРМАН кезеңі:</b> ${st.completedStages.length}/7</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Ұпайды түзету / Қосымша бағалау:</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="modal-edit-points" value="${st.points}" class="px-3 py-2 rounded-xl border border-parchment-300 w-32 font-bold">
+                            <button onclick="updateStudentPointsFromTeacher('${st.id}')" class="px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold">Ұпайды сақтау</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50 border border-gold-400/50">
+                        <span class="text-xs font-bold text-royal-900">«Үздік оқырмандар» галереясында жариялау:</span>
+                        <input type="checkbox" ${st.galleryApproved ? 'checked' : ''} onchange="toggleGalleryApproval('${st.id}', this.checked)" class="w-5 h-5 accent-gold-600">
+                    </div>
+
+                    <div class="max-h-48 overflow-y-auto space-y-2 text-xs">
+                        <p class="font-bold text-royal-900">Орындалған жауаптар:</p>
+                        ${Object.entries(st.stageAnswers).map(([k, v]) => `
+                            <div class="p-2.5 rounded-xl bg-white border border-parchment-300">
+                                <b>${OQYRMAN_STAGES[k]?.letter} – ${OQYRMAN_STAGES[k]?.title}:</b> ${v}
+                            </div>
+                        `).join('') || '<p class="text-slate-500">Жауаптар әлі жоқ.</p>'}
+                    </div>
+                </div>
+            `);
+        }
+
+        function updateStudentPointsFromTeacher(stId) {
+            const st = DB.students.find(s => s.id === stId);
+            const val = parseInt(document.getElementById('modal-edit-points').value);
+            if (st && !isNaN(val)) {
+                st.points = Math.max(0, val);
+                saveDB();
+                showToast("Оқушы ұпайы жаңартылды!", "success");
+                renderTeacherDashboard(document.getElementById('main-content'));
+            }
+        }
+
+        function toggleGalleryApproval(stId, approved) {
+            const st = DB.students.find(s => s.id === stId);
+            if (st) {
+                st.galleryApproved = approved;
+                saveDB();
+                showToast(approved ? "Галереяда жариялауға рұқсат берілді" : "Галереядан алынып тасталды", "info");
+            }
+        }
+
+        function exportTeacherCSV() {
+            let csv = "\uFEFFАты-жөні,Сыныбы,Мектеп,Оқылған кітап,Аяқталған кезең,Жинаған ұпай,Деңгей\n";
+            DB.students.forEach(s => {
+                const lvl = getLevelInfo(s.points).current.title;
+                csv += `"${s.name}","${s.grade}","${s.school}",${s.booksRead.length},${s.completedStages.length},${s.points},"${lvl}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `oqyrman_esep_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            showToast("Excel (CSV) есебі жүктелді!", "success");
+        }
+
+        // ------------------------------------------
+        // VIEW 14: MANAGE STUDENTS (ОҚУШЫЛАРДЫ БАСҚАРУ)
+        // ------------------------------------------
+        function renderStudentsManage(container) {
+            if (DB.currentUser?.role !== 'teacher') {
+                container.innerHTML = `<div class="p-8 text-center bg-white rounded-3xl"><p>${t('teacherOnly')}</p></div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm">
+                        <h2 class="font-serif text-2xl font-bold text-royal-900">👩‍🏫 Оқушылар мен сыныптарды басқару</h2>
+                        <p class="text-sm text-slate-600 mt-1">Жаңа оқушы тіркеу, логин/құпиясөз беру және тізімді өңдеу.</p>
+
+                        <form onsubmit="teacherAddStudent(event)" class="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                            <input type="text" id="t-add-name" placeholder="Оқушы аты-жөні" required class="px-3.5 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50 text-xs">
+                            <input type="text" id="t-add-grade" placeholder="Сыныбы (7 «Б»)" required class="px-3.5 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50 text-xs">
+                            <input type="text" id="t-add-login" placeholder="Логин" required class="px-3.5 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50 text-xs">
+                            <input type="text" id="t-add-pass" placeholder="Құпиясөз" required class="px-3.5 py-2.5 rounded-xl border border-parchment-300 bg-parchment-50 text-xs">
+                            <button type="submit" class="px-4 py-2.5 rounded-xl bg-royal-900 text-gold-400 font-bold text-xs shadow hover:bg-royal-800 transition">
+                                + Оқушы қосу
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-3xl border border-parchment-300 shadow-sm space-y-3">
+                        ${DB.students.map(s => `
+                            <div class="p-4 rounded-2xl bg-parchment-100 border border-parchment-300 flex flex-wrap items-center justify-between gap-3">
+                                <div>
+                                    <p class="font-bold text-sm text-royal-900">${s.avatar} ${s.name} <span class="text-xs font-normal text-slate-600">(${s.grade})</span></p>
+                                    <p class="text-xs text-slate-600">Логин: <b>${s.login}</b> • Құпиясөз: <b>${s.password}</b> • Ұпай: <b>${s.points}</b></p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="openStudentDetailModal('${s.id}')" class="px-3 py-1.5 rounded-xl bg-white border border-parchment-300 text-xs font-bold text-royal-900">Өңдеу</button>
+                                    <button onclick="teacherDeleteStudent('${s.id}')" class="px-3 py-1.5 rounded-xl bg-rose-100 text-rose-700 text-xs font-bold hover:bg-rose-200">Өшіру</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function teacherAddStudent(e) {
+            e.preventDefault();
+            const name = document.getElementById('t-add-name').value.trim();
+            const grade = document.getElementById('t-add-grade').value.trim();
+            const login = document.getElementById('t-add-login').value.trim().toLowerCase();
+            const password = document.getElementById('t-add-pass').value.trim();
+
+            if (DB.students.some(s => s.login.toLowerCase() === login)) {
+                showToast("Бұл логин тіркелген!", "error");
+                return;
+            }
+            DB.students.push({
+                id: 'st_' + Date.now(),
+                name, grade, school: DB.teacher.school, login, password,
+                avatar: '🧑🏻', points: 0, booksRead: [], completedStages: [], stageAnswers: {},
+                detectiveCompleted: [], litCourtSubmissions: [], creativeWorks: [], audioLogs: [],
+                achievements: [], galleryApproved: false, lastActive: new Date().toISOString().split('T')[0]
+            });
+            saveDB();
+            showToast(`${name} тізімге қосылды!`, "success");
+            renderStudentsManage(document.getElementById('main-content'));
+        }
+
+        function teacherDeleteStudent(stId) {
+            DB.students = DB.students.filter(s => s.id !== stId);
+            saveDB();
+            showToast("Оқушы тізімнен өшірілді", "info");
+            renderStudentsManage(document.getElementById('main-content'));
+        }
+
+        // ------------------------------------------
+        // VIEW 15: 10-MINUTE LESSON MODE (10 МИНУТТЫҚ САБАҚ)
+        // ------------------------------------------
+        let lesson10Interval = null;
+        let lesson10Remaining = 600;
+
+        function renderLesson10Min(container) {
+            if (lesson10Interval) clearInterval(lesson10Interval);
+            const blocks = [
+                { min: '1 минут', title: 'Қызығушылық ояту', task: 'Тақтадағы жұмбақ сурет бойынша шығарма тақырыбын болжау.' },
+                { min: '2 минут', title: 'Мәтінді оқу', task: 'Ыбырай Алтынсариннің «Әке мен бала» әңгімесін рөлге бөліп оқу.' },
+                { min: '2 минут', title: 'Ақпаратты табу', task: 'Мәтіннен баланың әрекетін сипаттайтын 3 тірек сөзді табу.' },
+                { min: '3 минут', title: 'Интерактивті тапсырма', task: '«Детектив оқырман» бөліміндегі 3 сұраққа сынып болып жауап беру.' },
+                { min: '1 минут', title: 'Қорытынды', task: 'Әңгіменің басты түйінін бір мақалмен жеткізу.' },
+                { min: '1 минут', title: 'Рефлексия', task: 'Бүгінгі сабақтан алған әсерді белгілеп, ұпайларды тіркеу.' }
+            ];
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="kazakh-pattern rounded-3xl p-6 text-white border border-gold-500/50 flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h2 class="font-serif text-2xl font-bold text-gold-400">⏱️ «10 минуттық сабақ» жедел режимі</h2>
+                            <p class="text-xs sm:text-sm text-amber-100/80">Сабақ үстінде интерактивті тақтада қолдануға арналған таймерлі құрылым.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="px-5 py-2.5 rounded-2xl bg-royal-950 border border-gold-400 text-2xl font-extrabold text-gold-400" id="l10-timer">
+                                10:00
+                            </div>
+                            <button onclick="startLesson10Timer()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">
+                                <i class="fas fa-play"></i> Бастау
+                            </button>
+                            <button onclick="resetLesson10Timer()" class="px-3 py-2.5 rounded-xl bg-royal-800 text-amber-200 text-xs font-bold">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${blocks.map((b, i) => `
+                            <div class="bg-white p-5 rounded-3xl border border-parchment-300 shadow-sm">
+                                <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">${i + 1}. ${b.min}</span>
+                                <h3 class="font-bold text-royal-900 text-base mt-3">${b.title}</h3>
+                                <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">${b.task}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="bg-white p-5 rounded-3xl border border-parchment-300 flex flex-wrap items-center justify-between gap-3">
+                        <p class="text-sm font-semibold text-royal-900">Сабақ соңында барлық белсенді оқушыларға +15 бонус ұпай беру:</p>
+                        <button onclick="awardClassBonus()" class="px-5 py-2.5 rounded-xl bg-gold-500 hover:bg-gold-400 text-royal-950 font-bold text-xs shadow transition">
+                            🎉 Сыныпқа +15 ұпай тіркеу
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startLesson10Timer() {
+            if (lesson10Interval) clearInterval(lesson10Interval);
+            lesson10Interval = setInterval(() => {
+                if (lesson10Remaining <= 0) {
+                    clearInterval(lesson10Interval);
+                    playSound('levelup');
+                    showToast("10 минуттық сабақ аяқталды!", "gold");
+                    return;
+                }
+                lesson10Remaining--;
+                const el = document.getElementById('l10-timer');
+                if (el) {
+                    const m = String(Math.floor(lesson10Remaining / 60)).padStart(2, '0');
+                    const s = String(lesson10Remaining % 60).padStart(2, '0');
+                    el.textContent = `${m}:${s}`;
+                } else {
+                    clearInterval(lesson10Interval);
+                }
+            }, 1000);
+        }
+
+        function resetLesson10Timer() {
+            if (lesson10Interval) clearInterval(lesson10Interval);
+            lesson10Remaining = 600;
+            const el = document.getElementById('l10-timer');
+            if (el) el.textContent = "10:00";
+        }
+
+        function awardClassBonus() {
+            DB.students.forEach(s => s.points += 15);
+            saveDB();
+            playSound('levelup');
+            showToast("Барлық оқушыларға 10 минуттық сабақ үшін +15 ұпай тіркелді!", "gold");
+        }
+
+        // ==========================================
+        // 8. INITIALIZATION & NETWORK MONITOR
+        // ==========================================
+        window.addEventListener('online', () => {
+            document.getElementById('network-text').textContent = t('onlineMode');
+        });
+        window.addEventListener('offline', () => {
+            document.getElementById('network-text').textContent = t('offlineMode');
+        });
+
+        window.onload = function() {
+            setLanguage(DB.lang || 'kk');
+            initWorkspace();
+        };
+    </script>
+</body>
+</html>
